@@ -15,25 +15,43 @@ use Spatie\Permission\Models\Permission;
 class PermissionController extends Controller
 {
     /**
-     * Display the permission listing.
+     * Display the permission listing with filters and pagination.
      */
     public function index(Request $request): Response
     {
         Gate::authorize('permissions.view', $request->user());
 
+        $search = trim((string) $request->string('search'));
+        $perPage = (int) $request->input('per_page', 10);
+
         $permissions = Permission::where('guard_name', 'web')
             ->withCount('roles')
+            ->when($search !== '', fn ($query) => $query->where('name', 'like', "%{$search}%"))
             ->orderBy('name')
-            ->get();
+            ->paginate($perPage)
+            ->withQueryString();
 
         return Inertia::render('admin/permissions/index', [
-            'permissions' => $permissions->map(fn (Permission $permission) => [
-                'id' => $permission->id,
-                'name' => $permission->name,
-                'guard_name' => $permission->guard_name,
-                'roles_count' => $permission->roles_count,
-                'created_at' => $permission->created_at->toIso8601String(),
-            ])->values(),
+            'permissions' => collect($permissions->items())
+                ->map(fn (Permission $permission) => [
+                    'id' => $permission->id,
+                    'name' => $permission->name,
+                    'guard_name' => $permission->guard_name,
+                    'roles_count' => $permission->roles_count,
+                    'created_at' => $permission->created_at->toIso8601String(),
+                ])
+                ->values()
+                ->all(),
+            'filters' => [
+                'search' => $search,
+                'per_page' => $perPage,
+            ],
+            'pagination' => [
+                'current_page' => $permissions->currentPage(),
+                'last_page' => $permissions->lastPage(),
+                'per_page' => $permissions->perPage(),
+                'total' => $permissions->total(),
+            ],
         ]);
     }
 

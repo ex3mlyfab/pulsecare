@@ -16,30 +16,45 @@ use Spatie\Permission\Models\Role;
 class RoleController extends Controller
 {
     /**
-     * Display the role listing.
+     * Display the role listing with filters and pagination.
      */
     public function index(Request $request): Response
     {
         Gate::authorize('roles.view', $request->user());
 
+        $search = trim((string) $request->string('search'));
+        $perPage = (int) $request->input('per_page', 10);
+
         $roles = Role::where('guard_name', 'web')
             ->with('permissions')
             ->withCount('users')
+            ->when($search !== '', fn ($query) => $query->where('name', 'like', "%{$search}%"))
             ->orderBy('name')
-            ->get();
+            ->paginate($perPage)
+            ->withQueryString();
 
         return Inertia::render('admin/roles/index', [
-            'roles' => $roles->map(fn (Role $role) => [
-                'id' => $role->id,
-                'name' => $role->name,
-                'guard_name' => $role->guard_name,
-                'users_count' => $role->users_count,
-                'permissions' => $role->permissions->pluck('id')->all(),
-                'created_at' => $role->created_at->toIso8601String(),
-            ])->values(),
-            'availablePermissions' => Permission::where('guard_name', 'web')
-                ->orderBy('name')
-                ->get(['id', 'name']),
+            'roles' => collect($roles->items())
+                ->map(fn (Role $role) => [
+                    'id' => $role->id,
+                    'name' => $role->name,
+                    'guard_name' => $role->guard_name,
+                    'users_count' => $role->users_count,
+                    'permissions' => $role->permissions->pluck('name')->values()->all(),
+                    'created_at' => $role->created_at->toIso8601String(),
+                ])
+                ->values()
+                ->all(),
+            'filters' => [
+                'search' => $search,
+                'per_page' => $perPage,
+            ],
+            'pagination' => [
+                'current_page' => $roles->currentPage(),
+                'last_page' => $roles->lastPage(),
+                'per_page' => $roles->perPage(),
+                'total' => $roles->total(),
+            ],
         ]);
     }
 

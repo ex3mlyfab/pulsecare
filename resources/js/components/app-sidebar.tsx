@@ -1,6 +1,7 @@
 import { Link } from '@inertiajs/react';
-import { BookOpen, FolderGit2, LayoutGrid, Lock, Shield } from 'lucide-react';
+import { BookOpen, FolderGit2, LayoutGrid, Settings } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
+import { NavCollapsible } from '@/components/nav-collapsible';
 import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
@@ -16,6 +17,7 @@ import {
 import { dashboard } from '@/routes';
 import { index as rolesIndex } from '@/routes/admin/roles';
 import { index as permissionsIndex } from '@/routes/admin/permissions';
+import { index as usersIndex } from '@/routes/admin/users';
 import type { NavItem } from '@/types';
 
 const mainNavItems: NavItem[] = [
@@ -24,17 +26,23 @@ const mainNavItems: NavItem[] = [
         href: dashboard().url,
         icon: LayoutGrid,
     },
+];
+
+const appSettingsItems: NavItem[] = [
     {
         title: 'Roles',
         href: rolesIndex().url,
-        icon: Shield,
     },
     {
         title: 'Permissions',
         href: permissionsIndex().url,
-        icon: Lock,
+    },
+    {
+        title: 'Users',
+        href: usersIndex().url,
     },
 ];
+
 const footerNavItems: NavItem[] = [
     {
         title: 'Repository',
@@ -65,6 +73,11 @@ export function AppSidebar() {
 
             <SidebarContent>
                 <NavMain items={mainNavItems} />
+                <NavCollapsible
+                    label="App Settings"
+                    icon={Settings}
+                    items={appSettingsItems}
+                />
             </SidebarContent>
 
             <SidebarFooter>

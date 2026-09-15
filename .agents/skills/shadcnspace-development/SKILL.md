@@ -16,6 +16,7 @@ https://mcp.shadcnspace.com/mcp
 ```
 
 Use this endpoint to:
+
 - Search and explore available blocks, components, and templates
 - Retrieve component/block code for copy-paste or CLI install
 - Discover what already exists before writing new UI code
@@ -97,13 +98,13 @@ When writing or reviewing UI code:
 
 ## ShadcnSpace Registry Categories
 
-| Category | Examples |
-|---|---|
-| Dashboard blocks | Dashboard shells, chart components, widgets, sidebars, login pages, dialog blocks |
-| Marketing blocks | Hero sections, pricing sections, feature sections, testimonials, CTAs, footers, newsletters |
-| Components | Accordion, avatar, button, badge, calendar, input, select, checkbox, card, tooltip, combobox, carousel, slider, collapsible, dropdown menu, slider, marquee, animated list |
-| Templates | Saazio (SaaS product), Atomist (SaaS landing), Awake (agency/portfolio) |
-| Pages | Login, dashboard, settings, 404, onboarding |
+| Category         | Examples                                                                                                                                                                   |
+| ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Dashboard blocks | Dashboard shells, chart components, widgets, sidebars, login pages, dialog blocks                                                                                          |
+| Marketing blocks | Hero sections, pricing sections, feature sections, testimonials, CTAs, footers, newsletters                                                                                |
+| Components       | Accordion, avatar, button, badge, calendar, input, select, checkbox, card, tooltip, combobox, carousel, slider, collapsible, dropdown menu, slider, marquee, animated list |
+| Templates        | Saazio (SaaS product), Atomist (SaaS landing), Awake (agency/portfolio)                                                                                                    |
+| Pages            | Login, dashboard, settings, 404, onboarding                                                                                                                                |
 
 ## Installation
 

@@ -27,7 +27,7 @@ export default function RoleCreate({
             'permissions',
             data.permissions.includes(permissionId)
                 ? data.permissions.filter((id) => id !== permissionId)
-                : [...data.permissions, permissionId]
+                : [...data.permissions, permissionId],
         );
     };
 
@@ -72,7 +72,9 @@ export default function RoleCreate({
                             >
                                 <Checkbox
                                     id={`permission-${permission.id}`}
-                                    checked={data.permissions.includes(permission.id)}
+                                    checked={data.permissions.includes(
+                                        permission.id,
+                                    )}
                                     onCheckedChange={() =>
                                         togglePermission(permission.id)
                                     }

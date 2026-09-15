@@ -1,9 +1,5 @@
 {
-    "agents": [
-        "codex",
-        "factory",
-        "grok_build"
-    ],
+    "agents": ["codex", "factory", "grok_build"],
     "cloud": true,
     "guidelines": true,
     "mcp": true,

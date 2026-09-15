@@ -92,7 +92,13 @@ const KPIS: Kpi[] = [
     },
 ];
 
-function Sparkline({ points, tone }: { points: number[]; tone: Kpi['deltaTone'] }) {
+function Sparkline({
+    points,
+    tone,
+}: {
+    points: number[];
+    tone: Kpi['deltaTone'];
+}) {
     const width = 96;
     const height = 28;
     const min = Math.min(...points);
@@ -110,7 +116,11 @@ function Sparkline({ points, tone }: { points: number[]; tone: Kpi['deltaTone'] 
     const [lastX, lastY] = coords[coords.length - 1];
 
     const stroke =
-        tone === 'stable' ? 'var(--stable)' : tone === 'urgent' ? 'var(--urgent)' : 'var(--bottleneck)';
+        tone === 'stable'
+            ? 'var(--stable)'
+            : tone === 'urgent'
+              ? 'var(--urgent)'
+              : 'var(--bottleneck)';
 
     return (
         <svg
@@ -140,9 +150,9 @@ export default function Welcome() {
         <>
             <Head title="PulseCare — Clinical Operations Engine" />
 
-            <div className="min-h-svh bg-background text-foreground">
+            <div className="bg-background text-foreground min-h-svh">
                 {/* Nav */}
-                <header className="border-border sticky top-0 z-30 border-b bg-background/80 backdrop-blur">
+                <header className="border-border bg-background/80 sticky top-0 z-30 border-b backdrop-blur">
                     <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
                         <div className="flex items-center gap-2.5">
                             <span className="bg-primary text-primary-foreground flex size-8 items-center justify-center rounded-md">
@@ -151,7 +161,10 @@ export default function Welcome() {
                             <span className="text-base font-semibold tracking-tight">
                                 PulseCare
                             </span>
-                            <Badge variant="secondary" className="hidden sm:inline-flex">
+                            <Badge
+                                variant="secondary"
+                                className="hidden sm:inline-flex"
+                            >
                                 Clinical Operations Engine
                             </Badge>
                         </div>
@@ -191,12 +204,14 @@ export default function Welcome() {
                                 Built for nursing units
                             </Badge>
                             <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
-                                Calm situational awareness for your nursing unit.
+                                Calm situational awareness for your nursing
+                                unit.
                             </h1>
                             <p className="muted-foreground mx-auto mt-4 max-w-2xl text-base leading-relaxed sm:text-lg">
-                                PulseCare collects your unit's data and turns it into
-                                interactive, filterable views and charts — so leaders
-                                can see the whole picture at a glance, even mid-shift.
+                                PulseCare collects your unit's data and turns it
+                                into interactive, filterable views and charts —
+                                so leaders can see the whole picture at a
+                                glance, even mid-shift.
                             </p>
                             <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
                                 <Button
@@ -204,7 +219,9 @@ export default function Welcome() {
                                     className="h-10 w-full rounded-md px-6 sm:w-auto"
                                 >
                                     <Link href={login()}>
-                                        {auth.user ? 'Go to dashboard' : 'Sign in'}
+                                        {auth.user
+                                            ? 'Go to dashboard'
+                                            : 'Sign in'}
                                     </Link>
                                 </Button>
                                 <Button
@@ -212,7 +229,9 @@ export default function Welcome() {
                                     variant="secondary"
                                     className="h-10 w-full rounded-md px-6 sm:w-auto"
                                 >
-                                    <a href="#capabilities">Explore capabilities</a>
+                                    <a href="#capabilities">
+                                        Explore capabilities
+                                    </a>
                                 </Button>
                             </div>
                         </div>
@@ -225,13 +244,16 @@ export default function Welcome() {
                                 <Card key={kpi.category}>
                                     <CardContent className="p-4">
                                         <div className="flex items-start justify-between">
-                                            <p className="label-md muted-foreground text-xs font-semibold uppercase tracking-wider">
+                                            <p className="label-md muted-foreground text-xs font-semibold tracking-wider uppercase">
                                                 {kpi.category}
                                             </p>
-                                            <Sparkline points={kpi.spark} tone={kpi.deltaTone} />
+                                            <Sparkline
+                                                points={kpi.spark}
+                                                tone={kpi.deltaTone}
+                                            />
                                         </div>
                                         <div className="mt-3 flex items-baseline gap-1.5">
-                                            <span className="tabular-nums text-2xl font-bold leading-none">
+                                            <span className="text-2xl leading-none font-bold tabular-nums">
                                                 {kpi.metric}
                                             </span>
                                             <span className="muted-foreground text-xs">
@@ -257,14 +279,17 @@ export default function Welcome() {
                     </section>
 
                     {/* Capabilities */}
-                    <section id="capabilities" className="border-border border-t pb-20 pt-8">
+                    <section
+                        id="capabilities"
+                        className="border-border border-t pt-8 pb-20"
+                    >
                         <div className="mb-8 flex flex-col gap-2 sm:mb-10">
                             <h2 className="text-2xl font-semibold tracking-tight">
                                 What PulseCare does for your unit
                             </h2>
                             <p className="muted-foreground max-w-2xl text-sm leading-relaxed sm:text-base">
-                                No clutter, no guesswork. Every element earns its place
-                                on the board.
+                                No clutter, no guesswork. Every element earns
+                                its place on the board.
                             </p>
                         </div>
 
@@ -273,7 +298,7 @@ export default function Welcome() {
                                 <Card key={title} className="h-full">
                                     <CardContent className="p-5">
                                         <div className="bg-primary flex size-10 items-center justify-center rounded-md">
-                                            <Icon className="size-5 text-primary-foreground" />
+                                            <Icon className="text-primary-foreground size-5" />
                                         </div>
                                         <h3 className="mt-4 text-base font-semibold">
                                             {title}
@@ -297,8 +322,8 @@ export default function Welcome() {
                                             Surge &amp; divert signals
                                         </h3>
                                         <p className="muted-foreground text-sm">
-                                            85% warning, 95% critical thresholds — clear,
-                                            color-coded, and immediate.
+                                            85% warning, 95% critical thresholds
+                                            — clear, color-coded, and immediate.
                                         </p>
                                     </div>
                                 </CardContent>
@@ -306,15 +331,16 @@ export default function Welcome() {
                             <Card>
                                 <CardContent className="flex items-center gap-4 p-5">
                                     <div className="bg-secondary flex size-10 shrink-0 items-center justify-center rounded-md">
-                                        <Users className="size-5 text-secondary-foreground" />
+                                        <Users className="text-secondary-foreground size-5" />
                                     </div>
                                     <div>
                                         <h3 className="text-base font-semibold">
                                             Role-aware views
                                         </h3>
                                         <p className="muted-foreground text-sm">
-                                            What a charge nurse needs is different from a
-                                            unit director's. Views adapt to the role.
+                                            What a charge nurse needs is
+                                            different from a unit director's.
+                                            Views adapt to the role.
                                         </p>
                                     </div>
                                 </CardContent>
@@ -328,15 +354,15 @@ export default function Welcome() {
                             <h2 className="text-xl font-semibold sm:text-2xl">
                                 Ready to see your unit clearly?
                             </h2>
-                            <p className="mx-auto mt-2 max-w-xl text-sm text-primary-foreground/80 sm:text-base">
-                                Sign in to open your dashboard, or get access from your
-                                hospital's PulseCare admin.
+                            <p className="text-primary-foreground/80 mx-auto mt-2 max-w-xl text-sm sm:text-base">
+                                Sign in to open your dashboard, or get access
+                                from your hospital's PulseCare admin.
                             </p>
                             <div className="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row">
                                 <Button
                                     asChild
                                     variant="secondary"
-                                    className="h-10 w-full rounded-md bg-white px-6 text-primary sm:w-auto"
+                                    className="text-primary h-10 w-full rounded-md bg-white px-6 sm:w-auto"
                                 >
                                     <Link href={login()}>Sign in</Link>
                                 </Button>

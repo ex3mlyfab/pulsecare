@@ -1,9 +1,9 @@
 import { Form, Head, Link, useForm } from '@inertiajs/react';
 import { Pencil, Search, Trash2 } from 'lucide-react';
-import RoleController from '@/actions/App/Http/Controllers/Admin/RoleController';
+import UserController from '@/actions/App/Http/Controllers/Admin/UserController';
 import InputError from '@/components/input-error';
-import { Pagination, type PaginationMeta } from '@/components/pagination';
 import Heading from '@/components/heading';
+import { Pagination, type PaginationMeta } from '@/components/pagination';
 import { Button } from '@/components/ui/button';
 import {
     Dialog,
@@ -16,6 +16,13 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
+import {
     Table,
     TableBody,
     TableCell,
@@ -24,26 +31,33 @@ import {
     TableRow,
 } from '@/components/ui/table';
 
-type Role = {
+type User = {
     id: number;
     name: string;
-    guard_name: string;
-    users_count: number;
-    permissions: string[];
+    email: string;
+    roles: string[];
     created_at: string;
+};
+
+type RoleOption = {
+    id: number;
+    name: string;
 };
 
 type Filters = {
     search: string;
+    role_id: number | string;
     per_page: number;
 };
 
-export default function RolesIndex({
-    roles,
+export default function UsersIndex({
+    users,
+    availableRoles,
     filters,
     pagination,
 }: {
-    roles: Role[];
+    users: User[];
+    availableRoles: RoleOption[];
     filters: Filters;
     pagination: PaginationMeta;
 }) {
@@ -51,39 +65,64 @@ export default function RolesIndex({
 
     const submitFilters = (e: React.FormEvent) => {
         e.preventDefault();
-        get(RoleController.index.url(), {
+        get(UserController.index.url(), {
             preserveState: true,
             replace: true,
-            only: ['roles', 'filters', 'pagination'],
+            only: ['users', 'filters', 'pagination'],
         });
     };
 
     const resolvePageUrl = (page: number) =>
-        RoleController.index.url({ query: { ...data, page } });
+        UserController.index.url({ query: { ...data, page } });
 
     return (
         <>
-            <Head title="Roles" />
+            <Head title="Users" />
             <Heading
-                title="Roles"
-                description="Manage application roles and their permissions"
+                title="Users"
+                description="Manage user accounts and their role assignments"
             />
 
             <div className="mb-6 flex flex-wrap items-center gap-3">
                 <form
                     onSubmit={submitFilters}
-                    className="flex w-full items-center gap-3 sm:max-w-md"
+                    className="flex w-full flex-wrap items-center gap-3 sm:max-w-xl"
                 >
-                    <div className="relative flex-1">
+                    <div className="relative min-w-48 flex-1">
                         <Search className="text-muted-foreground pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2" />
                         <Input
                             value={data.search}
                             onChange={(e) => setData('search', e.target.value)}
-                            placeholder="Search roles by name"
+                            placeholder="Search by name or email"
                             className="pl-8"
-                            aria-label="Search roles"
+                            aria-label="Search users"
                         />
                     </div>
+                    <Select
+                        value={String(data.role_id)}
+                        onValueChange={(value) =>
+                            setData('role_id', value === 'all' ? '' : value)
+                        }
+                        disabled={processing}
+                    >
+                        <SelectTrigger
+                            className="w-40"
+                            aria-label="Filter by role"
+                        >
+                            <SelectValue placeholder="All roles" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="all">All roles</SelectItem>
+                            {availableRoles.map((role) => (
+                                <SelectItem
+                                    key={role.id}
+                                    value={String(role.id)}
+                                >
+                                    {role.name}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
                     <Button
                         type="submit"
                         variant="secondary"
@@ -95,8 +134,8 @@ export default function RolesIndex({
                 </form>
 
                 <div className="ml-auto">
-                    <Link href={RoleController.create.url()}>
-                        <Button variant="default">New role</Button>
+                    <Link href={UserController.create.url()}>
+                        <Button variant="default">New user</Button>
                     </Link>
                 </div>
             </div>
@@ -105,61 +144,51 @@ export default function RolesIndex({
                 <Table>
                     <TableHeader>
                         <TableRow>
-                            <TableHead className="w-[40%]">Role</TableHead>
-                            <TableHead>Users</TableHead>
-                            <TableHead>Permissions</TableHead>
+                            <TableHead className="w-[35%]">User</TableHead>
+                            <TableHead>Email</TableHead>
+                            <TableHead>Roles</TableHead>
                             <TableHead>Actions</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {roles.map((role) => (
-                            <TableRow key={role.id}>
+                        {users.map((user) => (
+                            <TableRow key={user.id}>
                                 <TableCell>
                                     <div className="flex flex-col">
                                         <span className="font-medium tabular-nums">
-                                            {role.name}
+                                            {user.name}
                                         </span>
                                         <span className="text-muted-foreground text-xs">
-                                            {role.created_at}
+                                            Joined {user.created_at}
                                         </span>
                                     </div>
                                 </TableCell>
                                 <TableCell className="tabular-nums">
-                                    {role.users_count}
+                                    {user.email}
                                 </TableCell>
                                 <TableCell>
-                                    {role.permissions.length === 0 ? (
+                                    {user.roles.length === 0 ? (
                                         <span className="text-muted-foreground text-xs">
-                                            No permissions
+                                            No roles
                                         </span>
                                     ) : (
                                         <div className="flex flex-wrap gap-1">
-                                            {role.permissions
-                                                .slice(0, 4)
-                                                .map((permission) => (
-                                                    <span
-                                                        key={permission}
-                                                        className="border-sidebar-border/70 bg-muted/40 text-muted-foreground rounded-sm border px-1.5 py-0.5 text-xs"
-                                                    >
-                                                        {permission}
-                                                    </span>
-                                                ))}
-                                            {role.permissions.length > 4 && (
-                                                <span className="text-muted-foreground text-xs">
-                                                    +
-                                                    {role.permissions.length -
-                                                        4}{' '}
-                                                    more
+                                            {user.roles.map((role) => (
+                                                <span
+                                                    key={role}
+                                                    className="border-sidebar-border/70 bg-muted/40 text-muted-foreground rounded-sm border px-1.5 py-0.5 text-xs"
+                                                >
+                                                    {role}
                                                 </span>
-                                            )}
+                                            ))}
                                         </div>
                                     )}
                                 </TableCell>
                                 <TableCell>
                                     <div className="flex items-center gap-1">
                                         <Link
-                                            href={RoleController.edit.url({
-                                                role: role.id,
+                                            href={UserController.edit.url({
+                                                user: user.id,
                                             })}
                                         >
                                             <Button
@@ -171,21 +200,21 @@ export default function RolesIndex({
                                                 Edit
                                             </Button>
                                         </Link>
-                                        <RoleDeleteDialog
-                                            roleId={role.id}
-                                            roleLabel={role.name}
+                                        <UserDeleteDialog
+                                            userId={user.id}
+                                            userLabel={user.name}
                                         />
                                     </div>
                                 </TableCell>
                             </TableRow>
                         ))}
-                        {roles.length === 0 && (
+                        {users.length === 0 && (
                             <TableRow>
                                 <TableCell
                                     colSpan={4}
                                     className="text-muted-foreground py-8 text-center text-sm"
                                 >
-                                    No roles found.
+                                    No users found.
                                 </TableCell>
                             </TableRow>
                         )}
@@ -201,12 +230,12 @@ export default function RolesIndex({
     );
 }
 
-function RoleDeleteDialog({
-    roleId,
-    roleLabel,
+function UserDeleteDialog({
+    userId,
+    userLabel,
 }: {
-    roleId: number;
-    roleLabel: string;
+    userId: number;
+    userLabel: string;
 }) {
     return (
         <Dialog>
@@ -217,14 +246,14 @@ function RoleDeleteDialog({
                 </Button>
             </DialogTrigger>
             <DialogContent>
-                <DialogTitle>Delete role</DialogTitle>
+                <DialogTitle>Delete user</DialogTitle>
                 <DialogDescription>
-                    Are you sure you want to delete the &ldquo;{roleLabel}
-                    &rdquo; role? This action cannot be undone.
+                    Are you sure you want to delete the &ldquo;{userLabel}
+                    &rdquo; user? This action cannot be undone.
                 </DialogDescription>
 
                 <Form
-                    {...RoleController.destroy.form({ role: roleId })}
+                    {...UserController.destroy.form({ user: userId })}
                     options={{ preserveScroll: true }}
                     className="space-y-4"
                 >
@@ -239,7 +268,7 @@ function RoleDeleteDialog({
                                     variant="destructive"
                                     disabled={processing}
                                 >
-                                    Delete role
+                                    Delete user
                                 </Button>
                             </DialogFooter>
                         </>
@@ -250,11 +279,11 @@ function RoleDeleteDialog({
     );
 }
 
-RolesIndex.layout = {
+UsersIndex.layout = {
     breadcrumbs: [
         {
-            title: 'Roles',
-            href: RoleController.index.url(),
+            title: 'Users',
+            href: UserController.index.url(),
         },
     ],
 };

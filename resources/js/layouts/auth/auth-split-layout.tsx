@@ -28,22 +28,21 @@ export default function AuthSplitLayout({
                 </Link>
 
                 <div className="relative z-20 max-w-md">
-                    <h2 className="text-xl font-medium leading-snug">
+                    <h2 className="text-xl leading-snug font-medium">
                         Calm situational awareness for your nursing unit.
                     </h2>
                     <p className="mt-3 text-sm leading-relaxed text-white/75">
                         Collect, filter, and visualize your unit's data in real
-                        time — built for 12-hour shifts under hospital
-                        lighting.
+                        time — built for 12-hour shifts under hospital lighting.
                     </p>
                 </div>
 
                 <div className="relative z-20 flex items-center gap-3">
-                    <div className="grid h-11 w-11 place-items-center rounded-md bg-white/15 font-bold text-white ring-1 ring-white/25 tabular-nums">
+                    <div className="grid h-11 w-11 place-items-center rounded-md bg-white/15 font-bold text-white tabular-nums ring-1 ring-white/25">
                         6:00
                     </div>
                     <div>
-                        <p className="text-xs font-semibold uppercase tracking-wider text-white/70">
+                        <p className="text-xs font-semibold tracking-wider text-white/70 uppercase">
                             Live census
                         </p>
                         <p className="text-sm text-white">
@@ -59,7 +58,7 @@ export default function AuthSplitLayout({
                         href={home()}
                         className="relative z-20 flex items-center justify-center gap-2 lg:hidden"
                     >
-                        <span className="flex size-9 items-center justify-center rounded-md bg-primary text-primary-foreground">
+                        <span className="bg-primary text-primary-foreground flex size-9 items-center justify-center rounded-md">
                             <AppLogoIcon className="size-5 fill-current" />
                         </span>
                         <span className="font-medium">{name}</span>

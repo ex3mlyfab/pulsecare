@@ -1,25 +1,19 @@
 <?php
 
-use Laravel\Fortify\Features;
+test('the registration route is no longer available', function () {
+    $response = $this->get('/register');
 
-beforeEach(function () {
-    $this->skipUnlessFortifyHas(Features::registration());
+    $response->assertNotFound();
 });
 
-test('registration screen can be rendered', function () {
-    $response = $this->get(route('register'));
-
-    $response->assertOk();
-});
-
-test('new users can register', function () {
-    $response = $this->post(route('register.store'), [
+test('the registration store route is no longer available', function () {
+    $response = $this->post('/register', [
         'name' => 'Test User',
         'email' => 'test@example.com',
         'password' => 'password',
         'password_confirmation' => 'password',
     ]);
 
-    $this->assertAuthenticated();
-    $response->assertRedirect(route('dashboard', absolute: false));
+    $response->assertNotFound();
+    $this->assertGuest();
 });

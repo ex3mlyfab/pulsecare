@@ -1,5 +1,5 @@
 import { Link, usePage } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid, Menu, Search } from 'lucide-react';
+import { BookOpen, Folder, LayoutGrid, Menu, Search, Shield } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import AppLogoIcon from '@/components/app-logo-icon';
 import { Breadcrumbs } from '@/components/breadcrumbs';
@@ -12,8 +12,11 @@ import {
 } from '@/components/ui/dropdown-menu';
 import {
     NavigationMenu,
+    NavigationMenuContent,
     NavigationMenuItem,
+    NavigationMenuLink,
     NavigationMenuList,
+    NavigationMenuTrigger,
     navigationMenuTriggerStyle,
 } from '@/components/ui/navigation-menu';
 import {
@@ -57,6 +60,21 @@ const rightNavItems: NavItem[] = [
         title: 'Documentation',
         href: 'https://laravel.com/docs/starter-kits#react',
         icon: BookOpen,
+    },
+];
+
+const adminNavItems: NavItem[] = [
+    {
+        title: 'Roles',
+        href: '/admin/roles',
+    },
+    {
+        title: 'Permissions',
+        href: '/admin/permissions',
+    },
+    {
+        title: 'Users',
+        href: '/admin/users',
     },
 ];
 
@@ -106,6 +124,18 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                                     {item.icon && (
                                                         <item.icon className="h-5 w-5" />
                                                     )}
+                                                    <span>{item.title}</span>
+                                                </Link>
+                                            ))}
+                                        </div>
+
+                                        <div className="flex flex-col space-y-4">
+                                            {adminNavItems.map((item) => (
+                                                <Link
+                                                    key={item.title}
+                                                    href={item.href}
+                                                    className="flex items-center space-x-2 font-medium"
+                                                >
                                                     <span>{item.title}</span>
                                                 </Link>
                                             ))}
@@ -172,6 +202,34 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                     </NavigationMenuItem>
                                 ))}
                             </NavigationMenuList>
+                            <NavigationMenuItem className="relative flex h-full items-center">
+                                <NavigationMenuTrigger
+                                    className={cn(
+                                        navigationMenuTriggerStyle(),
+                                        isCurrentUrl('/admin', undefined, true) && activeItemStyles,
+                                        'h-9 cursor-pointer px-3',
+                                    )}
+                                >
+                                    <Shield className="mr-2 h-4 w-4" />
+                                    App Admin
+                                </NavigationMenuTrigger>
+                                <NavigationMenuContent>
+                                    <ul className="grid w-[200px] gap-2 p-2">
+                                        {adminNavItems.map((item) => (
+                                            <li key={item.title}>
+                                                <NavigationMenuLink asChild>
+                                                    <Link
+                                                        href={item.href}
+                                                        className="block select-none rounded-sm px-3 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                                                    >
+                                                        {item.title}
+                                                    </Link>
+                                                </NavigationMenuLink>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </NavigationMenuContent>
+                            </NavigationMenuItem>
                         </NavigationMenu>
                     </div>
 

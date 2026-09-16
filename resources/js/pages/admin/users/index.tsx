@@ -3,6 +3,7 @@ import { Pencil, Search, Trash2 } from 'lucide-react';
 import UserController from '@/actions/App/Http/Controllers/Admin/UserController';
 import InputError from '@/components/input-error';
 import Heading from '@/components/heading';
+import { usePermissions } from '@/hooks/use-permissions';
 import { Pagination, type PaginationMeta } from '@/components/pagination';
 import { Button } from '@/components/ui/button';
 import {
@@ -62,6 +63,7 @@ export default function UsersIndex({
     pagination: PaginationMeta;
 }) {
     const { data, setData, get, processing } = useForm<Filters>(filters);
+    const { can } = usePermissions();
 
     const submitFilters = (e: React.FormEvent) => {
         e.preventDefault();
@@ -134,9 +136,11 @@ export default function UsersIndex({
                 </form>
 
                 <div className="ml-auto">
-                    <Link href={UserController.create.url()}>
-                        <Button variant="default">New user</Button>
-                    </Link>
+                    {can('users.create') && (
+                        <Link href={UserController.create.url()}>
+                            <Button variant="default">New user</Button>
+                        </Link>
+                    )}
                 </div>
             </div>
 
@@ -186,24 +190,28 @@ export default function UsersIndex({
                                 </TableCell>
                                 <TableCell>
                                     <div className="flex items-center gap-1">
-                                        <Link
-                                            href={UserController.edit.url({
-                                                user: user.id,
-                                            })}
-                                        >
-                                            <Button
-                                                variant="outline"
-                                                size="sm"
-                                                className="gap-1"
+                                        {can('users.update') && (
+                                            <Link
+                                                href={UserController.edit.url({
+                                                    user: user.id,
+                                                })}
                                             >
-                                                <Pencil className="size-3.5" />
-                                                Edit
-                                            </Button>
-                                        </Link>
-                                        <UserDeleteDialog
-                                            userId={user.id}
-                                            userLabel={user.name}
-                                        />
+                                                <Button
+                                                    variant="outline"
+                                                    size="sm"
+                                                    className="gap-1"
+                                                >
+                                                    <Pencil className="size-3.5" />
+                                                    Edit
+                                                </Button>
+                                            </Link>
+                                        )}
+                                        {can('users.delete') && (
+                                            <UserDeleteDialog
+                                                userId={user.id}
+                                                userLabel={user.name}
+                                            />
+                                        )}
                                     </div>
                                 </TableCell>
                             </TableRow>

@@ -9,7 +9,7 @@ test('rbac seeder creates the canonical permissions and roles', function () {
     $this->seed(RbacSeeder::class);
 
     expect(Permission::where('guard_name', 'web')->count())->toBe(12);
-    expect(Role::where('guard_name', 'web')->count())->toBe(2);
+    expect(Role::where('guard_name', 'web')->count())->toBe(3);
 });
 
 test('rbac seeder is idempotent and re-syncs role permissions', function () {
@@ -18,7 +18,7 @@ test('rbac seeder is idempotent and re-syncs role permissions', function () {
     $this->seed(RbacSeeder::class);
 
     expect(Permission::where('guard_name', 'web')->count())->toBe(12);
-    expect(Role::where('guard_name', 'web')->count())->toBe(2);
+    expect(Role::where('guard_name', 'web')->count())->toBe(3);
 });
 
 test('admin role is seeded with full permission access', function () {
@@ -29,6 +29,14 @@ test('admin role is seeded with full permission access', function () {
 
     expect($admin->permissions->count())->toBe(12);
     expect($user->permissions->pluck('name')->all())->toBe(['users.view']);
+});
+
+test('super_admin role is seeded with full permission access', function () {
+    $this->seed(RbacSeeder::class);
+
+    $superAdmin = Role::where('guard_name', 'web')->where('name', 'super_admin')->firstOrFail();
+
+    expect($superAdmin->permissions->count())->toBe(12);
 });
 
 test('users seeded through the database seeder have no role by default', function () {

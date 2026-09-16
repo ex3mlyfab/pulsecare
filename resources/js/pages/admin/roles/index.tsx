@@ -4,6 +4,7 @@ import RoleController from '@/actions/App/Http/Controllers/Admin/RoleController'
 import InputError from '@/components/input-error';
 import { Pagination, type PaginationMeta } from '@/components/pagination';
 import Heading from '@/components/heading';
+import { usePermissions } from '@/hooks/use-permissions';
 import { Button } from '@/components/ui/button';
 import {
     Dialog,
@@ -48,6 +49,7 @@ export default function RolesIndex({
     pagination: PaginationMeta;
 }) {
     const { data, setData, get, processing } = useForm<Filters>(filters);
+    const { can } = usePermissions();
 
     const submitFilters = (e: React.FormEvent) => {
         e.preventDefault();
@@ -95,9 +97,11 @@ export default function RolesIndex({
                 </form>
 
                 <div className="ml-auto">
-                    <Link href={RoleController.create.url()}>
-                        <Button variant="default">New role</Button>
-                    </Link>
+                    {can('roles.create') && (
+                        <Link href={RoleController.create.url()}>
+                            <Button variant="default">New role</Button>
+                        </Link>
+                    )}
                 </div>
             </div>
 
@@ -157,24 +161,28 @@ export default function RolesIndex({
                                 </TableCell>
                                 <TableCell>
                                     <div className="flex items-center gap-1">
-                                        <Link
-                                            href={RoleController.edit.url({
-                                                role: role.id,
-                                            })}
-                                        >
-                                            <Button
-                                                variant="outline"
-                                                size="sm"
-                                                className="gap-1"
+                                        {can('roles.update') && (
+                                            <Link
+                                                href={RoleController.edit.url({
+                                                    role: role.id,
+                                                })}
                                             >
-                                                <Pencil className="size-3.5" />
-                                                Edit
-                                            </Button>
-                                        </Link>
-                                        <RoleDeleteDialog
-                                            roleId={role.id}
-                                            roleLabel={role.name}
-                                        />
+                                                <Button
+                                                    variant="outline"
+                                                    size="sm"
+                                                    className="gap-1"
+                                                >
+                                                    <Pencil className="size-3.5" />
+                                                    Edit
+                                                </Button>
+                                            </Link>
+                                        )}
+                                        {can('roles.delete') && (
+                                            <RoleDeleteDialog
+                                                roleId={role.id}
+                                                roleLabel={role.name}
+                                            />
+                                        )}
                                     </div>
                                 </TableCell>
                             </TableRow>

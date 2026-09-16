@@ -36,7 +36,12 @@ class RbacSeeder extends Seeder
 
         app(PermissionRegistrar::class)->forgetCachedPermissions();
 
-        foreach ($this->roles($permissions) as $role => $rolePermissions) {
+        $permissionNames = collect($permissions)
+            ->flatMap(fn (array $actions, string $entity) => collect($actions)->map(fn (string $action) => "{$entity}.{$action}"))
+            ->values()
+            ->all();
+
+        foreach ($this->roles($permissionNames) as $role => $rolePermissions) {
             $roleModel = Role::firstOrCreate(['name' => $role, 'guard_name' => self::GUARD]);
 
             $roleModel->syncPermissions($rolePermissions);
@@ -65,19 +70,19 @@ class RbacSeeder extends Seeder
     /**
      * The canonical list of roles and the permissions each should have.
      *
-     * @param  array<string, array<int, string>>  $permissions
+     * @param  array<int, string>  $permissionNames
      * @return array<string, array<int, string>>
      */
-    protected function roles(array $permissions): array
+    protected function roles(array $permissionNames): array
     {
+        $all = collect($permissionNames);
+
         return [
-            'admin' => collect($permissions)
-                ->flatMap(fn (array $actions, string $entity) => collect($actions)->map(fn (string $action) => "{$entity}.{$action}"))
-                ->values()
-                ->all(),
-            'user' => collect($permissions['users'] ?? [])
-                ->filter(fn (string $action) => $action === 'view')
-                ->map(fn (string $action) => "users.{$action}")
+            'super_admin' => $all->all(),
+            'admin' => $all->all(),
+            'user' => $all
+                ->filter(fn (string $permission) => str_starts_with($permission, 'users.'))
+                ->filter(fn (string $permission) => str_ends_with($permission, '.view'))
                 ->values()
                 ->all(),
         ];

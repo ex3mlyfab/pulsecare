@@ -3,6 +3,7 @@ import { Pencil, Search, Trash2 } from 'lucide-react';
 import PermissionController from '@/actions/App/Http/Controllers/Admin/PermissionController';
 import InputError from '@/components/input-error';
 import Heading from '@/components/heading';
+import { usePermissions } from '@/hooks/use-permissions';
 import { Pagination, type PaginationMeta } from '@/components/pagination';
 import { Button } from '@/components/ui/button';
 import {
@@ -47,6 +48,7 @@ export default function PermissionsIndex({
     pagination: PaginationMeta;
 }) {
     const { data, setData, get, processing } = useForm<Filters>(filters);
+    const { can } = usePermissions();
 
     const submitFilters = (e: React.FormEvent) => {
         e.preventDefault();
@@ -94,9 +96,11 @@ export default function PermissionsIndex({
                 </form>
 
                 <div className="ml-auto">
-                    <Link href={PermissionController.create.url()}>
-                        <Button variant="default">New permission</Button>
-                    </Link>
+                    {can('permissions.create') && (
+                        <Link href={PermissionController.create.url()}>
+                            <Button variant="default">New permission</Button>
+                        </Link>
+                    )}
                 </div>
             </div>
 
@@ -133,26 +137,30 @@ export default function PermissionsIndex({
                                 </TableCell>
                                 <TableCell>
                                     <div className="flex items-center gap-1">
-                                        <Link
-                                            href={PermissionController.edit.url(
-                                                {
-                                                    permission: permission.id,
-                                                },
-                                            )}
-                                        >
-                                            <Button
-                                                variant="outline"
-                                                size="sm"
-                                                className="gap-1"
+                                        {can('permissions.update') && (
+                                            <Link
+                                                href={PermissionController.edit.url(
+                                                    {
+                                                        permission: permission.id,
+                                                    },
+                                                )}
                                             >
-                                                <Pencil className="size-3.5" />
-                                                Edit
-                                            </Button>
-                                        </Link>
-                                        <PermissionDeleteDialog
-                                            permissionId={permission.id}
-                                            permissionLabel={permission.name}
-                                        />
+                                                <Button
+                                                    variant="outline"
+                                                    size="sm"
+                                                    className="gap-1"
+                                                >
+                                                    <Pencil className="size-3.5" />
+                                                    Edit
+                                                </Button>
+                                            </Link>
+                                        )}
+                                        {can('permissions.delete') && (
+                                            <PermissionDeleteDialog
+                                                permissionId={permission.id}
+                                                permissionLabel={permission.name}
+                                            />
+                                        )}
                                     </div>
                                 </TableCell>
                             </TableRow>

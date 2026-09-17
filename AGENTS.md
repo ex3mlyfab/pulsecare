@@ -18,6 +18,10 @@ Before relying on a package's API, confirm its installed version:
 
 This project has domain-specific skills available in `**/skills/**`. You MUST activate the relevant skill whenever you work in that domain—don't wait until you're stuck.
 
+## Database identifiers
+
+- Use ULID primary keys for every database table, including existing and future tables. Define primary keys with `$table->ulid('id')->primary()` and use `HasUlids` on corresponding Eloquent models. Foreign keys referencing ULID models must use `foreignUlid()` or `foreignUlidFor()`.
+
 ## Conventions
 
 - You must follow all existing code conventions used in this application. When creating or editing a file, check sibling files for the correct structure, approach, and naming.

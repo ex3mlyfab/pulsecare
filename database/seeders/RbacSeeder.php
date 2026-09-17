@@ -64,6 +64,7 @@ class RbacSeeder extends Seeder
             'roles' => ['view', 'create', 'update', 'delete'],
             'permissions' => ['view', 'create', 'update', 'delete'],
             'users' => ['view', 'create', 'update', 'delete'],
+            'wards' => ['view', 'create', 'update', 'delete'],
         ];
     }
 

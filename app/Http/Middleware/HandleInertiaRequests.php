@@ -43,7 +43,8 @@ class HandleInertiaRequests extends Middleware
                 ->pluck('name')
                 ->filter(fn (string $permission) => str_starts_with($permission, 'roles.')
                     || str_starts_with($permission, 'permissions.')
-                    || str_starts_with($permission, 'users.'))
+                    || str_starts_with($permission, 'users.')
+                    || str_starts_with($permission, 'wards.'))
                 ->values()
                 ->all()
             : [];

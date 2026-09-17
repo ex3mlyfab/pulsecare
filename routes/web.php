@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\PermissionController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\WardController;
 use Illuminate\Support\Facades\Route;
 
 Route::inertia('/', 'welcome')->name('home');
@@ -32,6 +33,13 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
     Route::get('users/{user}/edit', [UserController::class, 'edit'])->name('users.edit');
     Route::patch('users/{user}', [UserController::class, 'update'])->name('users.update');
     Route::delete('users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
+
+    Route::get('wards', [WardController::class, 'index'])->name('wards.index');
+    Route::get('wards/create', [WardController::class, 'create'])->name('wards.create');
+    Route::post('wards', [WardController::class, 'store'])->name('wards.store');
+    Route::get('wards/{ward}/edit', [WardController::class, 'edit'])->name('wards.edit');
+    Route::patch('wards/{ward}', [WardController::class, 'update'])->name('wards.update');
+    Route::delete('wards/{ward}', [WardController::class, 'destroy'])->name('wards.destroy');
 });
 
 require __DIR__.'/settings.php';

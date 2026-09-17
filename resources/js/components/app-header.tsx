@@ -1,5 +1,13 @@
 import { Link, usePage } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid, Menu, Search, Shield } from 'lucide-react';
+import {
+    BookOpen,
+    ChevronDown,
+    Folder,
+    LayoutGrid,
+    Menu,
+    Search,
+    Shield,
+} from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import AppLogoIcon from '@/components/app-logo-icon';
 import { Breadcrumbs } from '@/components/breadcrumbs';
@@ -10,6 +18,11 @@ import {
     DropdownMenuContent,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {
+    Collapsible,
+    CollapsibleContent,
+    CollapsibleTrigger,
+} from '@/components/ui/collapsible';
 import {
     NavigationMenu,
     NavigationMenuContent,
@@ -76,6 +89,10 @@ const adminNavItems: NavItem[] = [
         title: 'Users',
         href: '/admin/users',
     },
+    {
+        title: 'Wards',
+        href: '/admin/wards',
+    },
 ];
 
 const activeItemStyles = 'text-foreground dark:bg-card dark:text-foreground';
@@ -129,17 +146,36 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                             ))}
                                         </div>
 
-                                        <div className="flex flex-col space-y-4">
-                                            {adminNavItems.map((item) => (
-                                                <Link
-                                                    key={item.title}
-                                                    href={item.href}
-                                                    className="flex items-center space-x-2 font-medium"
-                                                >
-                                                    <span>{item.title}</span>
-                                                </Link>
-                                            ))}
-                                        </div>
+                                        <Collapsible
+                                            defaultOpen={isCurrentUrl(
+                                                '/admin',
+                                                undefined,
+                                                true,
+                                            )}
+                                            className="flex flex-col"
+                                        >
+                                            <CollapsibleTrigger className="group focus-visible:ring-ring flex items-center space-x-2 rounded-sm py-1 text-left font-medium outline-none focus-visible:ring-2">
+                                                <Shield className="h-5 w-5" />
+                                                <span>App Admin</span>
+                                                <ChevronDown className="ml-auto h-4 w-4 transition-transform duration-200 group-data-[state=open]:rotate-180" />
+                                            </CollapsibleTrigger>
+                                            <CollapsibleContent className="border-sidebar-border mt-2 flex flex-col space-y-2 border-l pl-7">
+                                                {adminNavItems.map((item) => (
+                                                    <Link
+                                                        key={item.title}
+                                                        href={item.href}
+                                                        className={cn(
+                                                            'hover:text-primary rounded-sm py-1 font-medium',
+                                                            isCurrentUrl(
+                                                                item.href,
+                                                            ) && 'text-primary',
+                                                        )}
+                                                    >
+                                                        {item.title}
+                                                    </Link>
+                                                ))}
+                                            </CollapsibleContent>
+                                        </Collapsible>
 
                                         <div className="flex flex-col space-y-4">
                                             {rightNavItems.map((item) => (
@@ -206,7 +242,11 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                 <NavigationMenuTrigger
                                     className={cn(
                                         navigationMenuTriggerStyle(),
-                                        isCurrentUrl('/admin', undefined, true) && activeItemStyles,
+                                        isCurrentUrl(
+                                            '/admin',
+                                            undefined,
+                                            true,
+                                        ) && activeItemStyles,
                                         'h-9 cursor-pointer px-3',
                                     )}
                                 >
@@ -220,7 +260,7 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                                 <NavigationMenuLink asChild>
                                                     <Link
                                                         href={item.href}
-                                                        className="block select-none rounded-sm px-3 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                                                        className="hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground block rounded-sm px-3 py-2 text-sm font-medium select-none"
                                                     >
                                                         {item.title}
                                                     </Link>

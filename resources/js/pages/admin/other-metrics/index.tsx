@@ -1,6 +1,6 @@
 import { Form, Head, Link, useForm } from '@inertiajs/react';
-import { Pencil, Search, Trash2 } from 'lucide-react';
-import WardController from '@/actions/App/Http/Controllers/Admin/WardController';
+import { Activity, CheckCircle2, Pencil, Search, Trash2 } from 'lucide-react';
+import OtherMetricController from '@/actions/App/Http/Controllers/Admin/OtherMetricController';
 import InputError from '@/components/input-error';
 import Heading from '@/components/heading';
 import { usePermissions } from '@/hooks/use-permissions';
@@ -32,19 +32,11 @@ import {
     TableRow,
 } from '@/components/ui/table';
 
-type Ward = {
+type OtherMetric = {
     id: string;
     name: string;
-    beds_count: number | null;
-    location: string | null;
     status: string;
-    matron_in_charge: { id: string; name: string } | null;
     created_at: string;
-};
-
-type MatronOption = {
-    id: string;
-    name: string;
 };
 
 type Filters = {
@@ -53,14 +45,12 @@ type Filters = {
     per_page: number;
 };
 
-export default function WardsIndex({
-    wards,
-    availableMatrons,
+export default function OtherMetricsIndex({
+    otherMetrics,
     filters,
     pagination,
 }: {
-    wards: Ward[];
-    availableMatrons: MatronOption[];
+    otherMetrics: OtherMetric[];
     filters: Filters;
     pagination: PaginationMeta;
 }) {
@@ -69,25 +59,31 @@ export default function WardsIndex({
 
     const submitFilters = (e: React.FormEvent) => {
         e.preventDefault();
-        get(WardController.index.url(), {
+        get(OtherMetricController.index.url(), {
             preserveState: true,
             replace: true,
-            only: ['wards', 'filters', 'pagination'],
+            only: ['otherMetrics', 'filters', 'pagination'],
         });
     };
 
     const resolvePageUrl = (page: number) =>
-        WardController.index.url({ query: { ...data, page } });
+        OtherMetricController.index.url({ query: { ...data, page } });
 
     return (
         <>
-            <Head title="Wards" />
+            <Head title="Other Metrics" />
             <Heading
-                title="Wards"
-                description="Manage hospital wards and their matrons in charge"
+                title="Other Metrics"
+                description="Manage other clinical metrics and their status"
             />
 
-            <div className="mb-6 flex flex-wrap items-center gap-3">
+            <div className="mb-6 grid gap-3 sm:grid-cols-3">
+                <MetricSummary label="Total metrics" value={pagination.total} icon={Activity} tone="primary" />
+                <MetricSummary label="Active" value={otherMetrics.filter((metric) => metric.status === 'Active').length} icon={CheckCircle2} tone="stable" />
+                <MetricSummary label="Showing" value={otherMetrics.length} icon={Search} tone="secondary" />
+            </div>
+
+            <div className="border-border bg-muted/50 mb-6 flex flex-wrap items-center gap-3 rounded-lg border p-3">
                 <form
                     onSubmit={submitFilters}
                     className="flex w-full flex-wrap items-center gap-3 sm:max-w-xl"
@@ -97,9 +93,9 @@ export default function WardsIndex({
                         <Input
                             value={data.search}
                             onChange={(e) => setData('search', e.target.value)}
-                            placeholder="Search by name or location"
+                            placeholder="Search by name"
                             className="pl-8"
-                            aria-label="Search wards"
+                            aria-label="Search other metrics"
                         />
                     </div>
                     <Select
@@ -132,9 +128,9 @@ export default function WardsIndex({
                 </form>
 
                 <div className="ml-auto">
-                    {can('wards.create') && (
-                        <Link href={WardController.create.url()}>
-                            <Button variant="default">New ward</Button>
+                    {can('other_metrics.create') && (
+                        <Link href={OtherMetricController.create.url()}>
+                            <Button variant="default">New metric</Button>
                         </Link>
                     )}
                 </div>
@@ -144,70 +140,51 @@ export default function WardsIndex({
                 <Table>
                     <TableHeader>
                         <TableRow>
-                            <TableHead className="w-[35%]">Ward</TableHead>
-                            <TableHead>Beds</TableHead>
-                            <TableHead>Location</TableHead>
+                            <TableHead className="w-[40%]">Metric</TableHead>
                             <TableHead>Status</TableHead>
-                            <TableHead>Matron in charge</TableHead>
                             <TableHead>Actions</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {wards.map((ward) => (
-                            <TableRow key={ward.id}>
+                        {otherMetrics.map((otherMetric) => (
+                            <TableRow key={otherMetric.id}>
                                 <TableCell>
                                     <div className="flex flex-col">
                                         <span className="font-medium">
-                                            {ward.name}
+                                            {otherMetric.name}
                                         </span>
                                         <span className="text-muted-foreground text-xs">
                                             Created{' '}
                                             {new Date(
-                                                ward.created_at,
+                                                otherMetric.created_at,
                                             ).toLocaleDateString()}
                                         </span>
                                     </div>
                                 </TableCell>
-                                <TableCell className="text-muted-foreground tabular-nums">
-                                    {ward.beds_count ?? '—'}
-                                </TableCell>
-                                <TableCell>
-                                    {ward.location || (
-                                        <span className="text-muted-foreground text-xs">
-                                            No location set
-                                        </span>
-                                    )}
-                                </TableCell>
                                 <TableCell>
                                     <span
                                         className={
-                                            'rounded-sm px-1.5 py-0.5 text-xs font-medium ' +
-                                            (ward.status === 'Active'
-                                                ? 'bg-green-50 text-green-700'
-                                                : 'bg-gray-100 text-gray-600')
+                                            'inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-xs font-medium ' +
+                                            (otherMetric.status === 'Active'
+                                                ? 'border-stable-border bg-stable-surface text-stable'
+                                                : 'border-border bg-muted text-muted-foreground')
                                         }
                                     >
-                                        {ward.status}
+                                        <span className={`size-1.5 rounded-full ${otherMetric.status === 'Active' ? 'bg-stable' : 'bg-muted-foreground'}`} />
+                                        {otherMetric.status}
                                     </span>
                                 </TableCell>
                                 <TableCell>
-                                    {ward.matron_in_charge ? (
-                                        <span>
-                                            {ward.matron_in_charge.name}
-                                        </span>
-                                    ) : (
-                                        <span className="text-muted-foreground text-xs">
-                                            Unassigned
-                                        </span>
-                                    )}
-                                </TableCell>
-                                <TableCell>
                                     <div className="flex items-center gap-1">
-                                        {can('wards.update') && (
+                                        {can('other_metrics.update') && (
                                             <Link
-                                                href={WardController.edit.url({
-                                                    ward: ward.id,
-                                                })}
+                                                href={
+                                                    OtherMetricController.edit
+                                                        .url({
+                                                            other_metric:
+                                                                otherMetric.id,
+                                                        })
+                                                }
                                             >
                                                 <Button
                                                     variant="outline"
@@ -219,23 +196,25 @@ export default function WardsIndex({
                                                 </Button>
                                             </Link>
                                         )}
-                                        {can('wards.delete') && (
-                                            <WardDeleteDialog
-                                                wardId={ward.id}
-                                                wardLabel={ward.name}
+                                        {can('other_metrics.delete') && (
+                                            <OtherMetricDeleteDialog
+                                                otherMetricId={otherMetric.id}
+                                                otherMetricLabel={
+                                                    otherMetric.name
+                                                }
                                             />
                                         )}
                                     </div>
                                 </TableCell>
                             </TableRow>
                         ))}
-                        {wards.length === 0 && (
+                        {otherMetrics.length === 0 && (
                             <TableRow>
                                 <TableCell
-                                    colSpan={6}
+                                    colSpan={3}
                                     className="text-muted-foreground py-8 text-center text-sm"
                                 >
-                                    No wards found.
+                                    No other metrics found.
                                 </TableCell>
                             </TableRow>
                         )}
@@ -251,12 +230,22 @@ export default function WardsIndex({
     );
 }
 
-function WardDeleteDialog({
-    wardId,
-    wardLabel,
+function MetricSummary({ label, value, icon: Icon, tone }: { label: string; value: number; icon: typeof Activity; tone: 'primary' | 'stable' | 'secondary' }) {
+    const toneClass = { primary: 'bg-primary/10 text-primary', stable: 'bg-stable-surface text-stable', secondary: 'bg-secondary/10 text-secondary' }[tone];
+    return (
+        <div className="border-border bg-card flex items-center gap-3 rounded-lg border p-4 shadow-layer-1">
+            <span className={`rounded-md p-2 ${toneClass}`}><Icon className="size-4" /></span>
+            <div><p className="text-muted-foreground text-xs font-semibold tracking-[0.1em] uppercase">{label}</p><p className="mt-1 text-2xl font-bold tabular-nums">{value}</p></div>
+        </div>
+    );
+}
+
+function OtherMetricDeleteDialog({
+    otherMetricId,
+    otherMetricLabel,
 }: {
-    wardId: string;
-    wardLabel: string;
+    otherMetricId: string;
+    otherMetricLabel: string;
 }) {
     return (
         <Dialog>
@@ -267,14 +256,17 @@ function WardDeleteDialog({
                 </Button>
             </DialogTrigger>
             <DialogContent>
-                <DialogTitle>Delete ward</DialogTitle>
+                <DialogTitle>Delete other metric</DialogTitle>
                 <DialogDescription>
-                    Are you sure you want to delete the &ldquo;{wardLabel}
-                    &rdquo; ward? This action cannot be undone.
+                    Are you sure you want to delete the &ldquo;
+                    {otherMetricLabel}
+                    &rdquo; metric? This action cannot be undone.
                 </DialogDescription>
 
                 <Form
-                    {...WardController.destroy.form({ ward: wardId })}
+                    {...OtherMetricController.destroy.form({
+                        other_metric: otherMetricId,
+                    })}
                     options={{ preserveScroll: true }}
                     className="space-y-4"
                 >
@@ -289,7 +281,7 @@ function WardDeleteDialog({
                                     variant="destructive"
                                     disabled={processing}
                                 >
-                                    Delete ward
+                                    Delete metric
                                 </Button>
                             </DialogFooter>
                         </>
@@ -300,11 +292,11 @@ function WardDeleteDialog({
     );
 }
 
-WardsIndex.layout = {
+OtherMetricsIndex.layout = {
     breadcrumbs: [
         {
-            title: 'Wards',
-            href: WardController.index.url(),
+            title: 'Other Metrics',
+            href: OtherMetricController.index.url(),
         },
     ],
 };

@@ -1,6 +1,9 @@
 <?php
 
+use App\Http\Controllers\Admin\ClinicController;
+use App\Http\Controllers\Admin\OtherMetricController;
 use App\Http\Controllers\Admin\PermissionController;
+use App\Http\Controllers\Admin\RecordStatController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\WardController;
@@ -10,6 +13,9 @@ Route::inertia('/', 'welcome')->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::inertia('dashboard', 'dashboard')->name('dashboard');
+    Route::get('record-stats', [RecordStatController::class, 'index'])->name('record-stats.index');
+    Route::post('record-stats', [RecordStatController::class, 'store'])->name('record-stats.store');
+    Route::patch('record-stats/{record_stat}', [RecordStatController::class, 'update'])->name('record-stats.update');
 });
 
 Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(function () {
@@ -40,6 +46,21 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
     Route::get('wards/{ward}/edit', [WardController::class, 'edit'])->name('wards.edit');
     Route::patch('wards/{ward}', [WardController::class, 'update'])->name('wards.update');
     Route::delete('wards/{ward}', [WardController::class, 'destroy'])->name('wards.destroy');
+
+    Route::get('clinics', [ClinicController::class, 'index'])->name('clinics.index');
+    Route::get('clinics/create', [ClinicController::class, 'create'])->name('clinics.create');
+    Route::post('clinics', [ClinicController::class, 'store'])->name('clinics.store');
+    Route::get('clinics/{clinic}/edit', [ClinicController::class, 'edit'])->name('clinics.edit');
+    Route::patch('clinics/{clinic}', [ClinicController::class, 'update'])->name('clinics.update');
+    Route::delete('clinics/{clinic}', [ClinicController::class, 'destroy'])->name('clinics.destroy');
+
+    Route::get('other-metrics', [OtherMetricController::class, 'index'])->name('other-metrics.index');
+    Route::get('other-metrics/create', [OtherMetricController::class, 'create'])->name('other-metrics.create');
+    Route::post('other-metrics', [OtherMetricController::class, 'store'])->name('other-metrics.store');
+    Route::get('other-metrics/check-name', [OtherMetricController::class, 'checkName'])->name('other-metrics.check-name');
+    Route::get('other-metrics/{other_metric}/edit', [OtherMetricController::class, 'edit'])->name('other-metrics.edit');
+    Route::patch('other-metrics/{other_metric}', [OtherMetricController::class, 'update'])->name('other-metrics.update');
+    Route::delete('other-metrics/{other_metric}', [OtherMetricController::class, 'destroy'])->name('other-metrics.destroy');
 });
 
 require __DIR__.'/settings.php';

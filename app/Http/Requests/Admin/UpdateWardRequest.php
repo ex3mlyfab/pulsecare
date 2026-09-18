@@ -32,6 +32,13 @@ class UpdateWardRequest extends FormRequest
                 'required',
                 'string',
                 'max:255',
+                Rule::unique('wards', 'name')->ignore($ward->id),
+            ],
+            'beds_count' => [
+                'nullable',
+                'integer',
+                'min:0',
+                'max:9999',
             ],
             'location' => [
                 'nullable',

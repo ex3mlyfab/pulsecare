@@ -141,7 +141,8 @@ export default function PermissionsIndex({
                                             <Link
                                                 href={PermissionController.edit.url(
                                                     {
-                                                        permission: permission.id,
+                                                        permission:
+                                                            permission.id,
                                                     },
                                                 )}
                                             >
@@ -158,7 +159,9 @@ export default function PermissionsIndex({
                                         {can('permissions.delete') && (
                                             <PermissionDeleteDialog
                                                 permissionId={permission.id}
-                                                permissionLabel={permission.name}
+                                                permissionLabel={
+                                                    permission.name
+                                                }
                                             />
                                         )}
                                     </div>

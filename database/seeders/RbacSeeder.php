@@ -65,6 +65,9 @@ class RbacSeeder extends Seeder
             'permissions' => ['view', 'create', 'update', 'delete'],
             'users' => ['view', 'create', 'update', 'delete'],
             'wards' => ['view', 'create', 'update', 'delete'],
+            'clinics' => ['view', 'create', 'update', 'delete'],
+            'other_metrics' => ['view', 'create', 'update', 'delete'],
+            'record_stats' => ['view', 'create', 'update', 'delete'],
         ];
     }
 

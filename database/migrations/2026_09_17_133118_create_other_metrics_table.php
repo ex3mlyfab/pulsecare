@@ -11,13 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('wards', function (Blueprint $table) {
+        Schema::create('other_metrics', function (Blueprint $table) {
             $table->ulid('id')->primary();
             $table->string('name')->unique();
-            $table->unsignedInteger('beds_count')->nullable();
-            $table->string('location')->nullable();
             $table->enum('status', ['Active', 'Inactive'])->default('Active');
-            $table->foreignId('matron_in_charge_id')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
         });
     }
@@ -27,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('wards');
+        Schema::dropIfExists('other_metrics');
     }
 };

@@ -2,18 +2,19 @@
 
 namespace App\Http\Requests\Admin;
 
+use App\Models\OtherMetric;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class StoreWardRequest extends FormRequest
+class UpdateOtherMetricRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        return $this->user()->can('wards.create');
+        return $this->user()->can('other_metrics.update');
     }
 
     /**
@@ -23,31 +24,19 @@ class StoreWardRequest extends FormRequest
      */
     public function rules(): array
     {
+        /** @var OtherMetric $otherMetric */
+        $otherMetric = $this->route('other_metric');
+
         return [
             'name' => [
                 'required',
                 'string',
                 'max:255',
-                Rule::unique('wards', 'name'),
-            ],
-            'beds_count' => [
-                'nullable',
-                'integer',
-                'min:0',
-                'max:9999',
-            ],
-            'location' => [
-                'nullable',
-                'string',
-                'max:255',
+                Rule::unique('other_metrics', 'name')->ignore($otherMetric->id),
             ],
             'status' => [
                 'required',
                 Rule::in(['Active', 'Inactive']),
-            ],
-            'matron_in_charge_id' => [
-                'nullable',
-                Rule::exists('users', 'id'),
             ],
         ];
     }

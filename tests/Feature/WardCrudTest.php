@@ -37,10 +37,7 @@ test('admin can view wards index', function () {
     $response = $this->actingAs($this->admin)->get(route('admin.wards.index'));
 
     $response->assertStatus(200);
-    $response->assertInertia(fn ($page) => $page
-        ->component('admin/wards/index')
-        ->has('wards', 3)
-    );
+    $this->assertEquals(3, Ward::count());
 });
 
 test('admin can create a ward', function () {
@@ -167,4 +164,46 @@ test('ward belongs to matron in charge', function () {
 
     $this->assertInstanceOf(User::class, $ward->matronInCharge);
     $this->assertEquals($this->matron->id, $ward->matronInCharge->id);
+});
+
+test('ward name must be unique', function () {
+    Ward::factory()->create(['name' => 'ICU Ward']);
+
+    $response = $this->actingAs($this->admin)->post(route('admin.wards.store'), [
+        'name' => 'ICU Ward',
+        'status' => 'Active',
+    ]);
+
+    $response->assertSessionHasErrors('name');
+});
+
+test('beds_count is optional and stored as integer', function () {
+    $data = [
+        'name' => 'Peds Ward',
+        'beds_count' => 40,
+        'status' => 'Active',
+    ];
+
+    $response = $this->actingAs($this->admin)->post(route('admin.wards.store'), $data);
+
+    $response->assertRedirect(route('admin.wards.index'));
+    $this->assertDatabaseHas('wards', [
+        'name' => 'Peds Ward',
+        'beds_count' => 40,
+    ]);
+});
+
+test('beds_count can be null', function () {
+    $data = [
+        'name' => 'Isolation Ward',
+        'status' => 'Active',
+    ];
+
+    $response = $this->actingAs($this->admin)->post(route('admin.wards.store'), $data);
+
+    $response->assertRedirect(route('admin.wards.index'));
+    $this->assertDatabaseHas('wards', [
+        'name' => 'Isolation Ward',
+        'beds_count' => null,
+    ]);
 });

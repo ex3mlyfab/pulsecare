@@ -1,5 +1,5 @@
 import { Link } from '@inertiajs/react';
-import { BookOpen, FolderGit2, LayoutGrid, Settings } from 'lucide-react';
+import { BarChart3, BookOpen, FolderGit2, LayoutGrid, Settings } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import { NavCollapsible } from '@/components/nav-collapsible';
 import { NavFooter } from '@/components/nav-footer';
@@ -15,9 +15,11 @@ import {
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
+import { index as recordStatsIndex } from '@/routes/record-stats';
 import { index as rolesIndex } from '@/routes/admin/roles';
 import { index as permissionsIndex } from '@/routes/admin/permissions';
 import { index as usersIndex } from '@/routes/admin/users';
+import { index as otherMetricsIndex } from '@/routes/admin/other-metrics';
 import type { NavItem } from '@/types';
 
 const mainNavItems: NavItem[] = [
@@ -25,6 +27,11 @@ const mainNavItems: NavItem[] = [
         title: 'Dashboard',
         href: dashboard().url,
         icon: LayoutGrid,
+    },
+    {
+        title: 'Record Stats',
+        href: recordStatsIndex().url,
+        icon: BarChart3,
     },
 ];
 
@@ -40,6 +47,10 @@ const appSettingsItems: NavItem[] = [
     {
         title: 'Users',
         href: usersIndex().url,
+    },
+    {
+        title: 'Other Metrics',
+        href: otherMetricsIndex().url,
     },
 ];
 

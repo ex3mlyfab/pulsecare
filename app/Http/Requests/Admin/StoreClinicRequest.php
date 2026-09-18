@@ -6,14 +6,14 @@ use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class StoreWardRequest extends FormRequest
+class StoreClinicRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        return $this->user()->can('wards.create');
+        return $this->user()->can('clinics.create');
     }
 
     /**
@@ -28,26 +28,20 @@ class StoreWardRequest extends FormRequest
                 'required',
                 'string',
                 'max:255',
-                Rule::unique('wards', 'name'),
-            ],
-            'beds_count' => [
-                'nullable',
-                'integer',
-                'min:0',
-                'max:9999',
+                Rule::unique('clinics', 'name'),
             ],
             'location' => [
                 'nullable',
                 'string',
                 'max:255',
             ],
-            'status' => [
-                'required',
-                Rule::in(['Active', 'Inactive']),
+            'operating_days' => [
+                'present',
+                'array',
             ],
-            'matron_in_charge_id' => [
-                'nullable',
-                Rule::exists('users', 'id'),
+            'operating_days.*' => [
+                'string',
+                Rule::in(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']),
             ],
         ];
     }

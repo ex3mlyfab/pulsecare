@@ -44,7 +44,10 @@ class HandleInertiaRequests extends Middleware
                 ->filter(fn (string $permission) => str_starts_with($permission, 'roles.')
                     || str_starts_with($permission, 'permissions.')
                     || str_starts_with($permission, 'users.')
-                    || str_starts_with($permission, 'wards.'))
+                    || str_starts_with($permission, 'wards.')
+                    || str_starts_with($permission, 'clinics.')
+                    || str_starts_with($permission, 'other_metrics.')
+                    || str_starts_with($permission, 'record_stats.'))
                 ->values()
                 ->all()
             : [];

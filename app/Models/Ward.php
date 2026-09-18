@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Symfony\Component\Uid\Ulid;
 
-#[Fillable(['name', 'location', 'status', 'matron_in_charge_id'])]
+#[Fillable(['name', 'beds_count', 'location', 'status', 'matron_in_charge_id'])]
 class Ward extends Model
 {
     /** @use HasFactory<WardFactory> */
@@ -33,6 +33,7 @@ class Ward extends Model
     {
         return [
             'status' => WardStatus::class,
+            'beds_count' => 'integer',
             'matron_in_charge_id' => 'string',
         ];
     }

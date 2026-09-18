@@ -1,6 +1,6 @@
 import { Form, Head, Link, useForm } from '@inertiajs/react';
 import { Pencil, Search, Trash2 } from 'lucide-react';
-import WardController from '@/actions/App/Http/Controllers/Admin/WardController';
+import ClinicController from '@/actions/App/Http/Controllers/Admin/ClinicController';
 import InputError from '@/components/input-error';
 import Heading from '@/components/heading';
 import { usePermissions } from '@/hooks/use-permissions';
@@ -32,35 +32,46 @@ import {
     TableRow,
 } from '@/components/ui/table';
 
-type Ward = {
-    id: string;
-    name: string;
-    beds_count: number | null;
-    location: string | null;
-    status: string;
-    matron_in_charge: { id: string; name: string } | null;
-    created_at: string;
-};
+export const OPERATING_DAYS = [
+    'Monday',
+    'Tuesday',
+    'Wednesday',
+    'Thursday',
+    'Friday',
+    'Saturday',
+    'Sunday',
+] as const;
 
-type MatronOption = {
+type OperatingDay = (typeof OPERATING_DAYS)[number];
+
+type Clinic = {
     id: string;
     name: string;
+    location: string | null;
+    operating_days: OperatingDay[];
+    created_at: string;
 };
 
 type Filters = {
     search: string;
-    status: string;
+    day: string;
     per_page: number;
 };
 
-export default function WardsIndex({
-    wards,
-    availableMatrons,
+function formatDays(days: OperatingDay[]): string {
+    if (days.length === 0) {
+        return '—';
+    }
+    const initials = days.map((d) => d.slice(0, 2).toUpperCase());
+    return initials.join(' · ');
+}
+
+export default function ClinicsIndex({
+    clinics,
     filters,
     pagination,
 }: {
-    wards: Ward[];
-    availableMatrons: MatronOption[];
+    clinics: Clinic[];
     filters: Filters;
     pagination: PaginationMeta;
 }) {
@@ -69,22 +80,22 @@ export default function WardsIndex({
 
     const submitFilters = (e: React.FormEvent) => {
         e.preventDefault();
-        get(WardController.index.url(), {
+        get(ClinicController.index.url(), {
             preserveState: true,
             replace: true,
-            only: ['wards', 'filters', 'pagination'],
+            only: ['clinics', 'filters', 'pagination'],
         });
     };
 
     const resolvePageUrl = (page: number) =>
-        WardController.index.url({ query: { ...data, page } });
+        ClinicController.index.url({ query: { ...data, page } });
 
     return (
         <>
-            <Head title="Wards" />
+            <Head title="Clinics" />
             <Heading
-                title="Wards"
-                description="Manage hospital wards and their matrons in charge"
+                title="Clinics"
+                description="Manage clinics and the days of the week they hold"
             />
 
             <div className="mb-6 flex flex-wrap items-center gap-3">
@@ -99,26 +110,29 @@ export default function WardsIndex({
                             onChange={(e) => setData('search', e.target.value)}
                             placeholder="Search by name or location"
                             className="pl-8"
-                            aria-label="Search wards"
+                            aria-label="Search clinics"
                         />
                     </div>
                     <Select
-                        value={data.status || 'all'}
+                        value={data.day || 'all'}
                         onValueChange={(value) =>
-                            setData('status', value === 'all' ? '' : value)
+                            setData('day', value === 'all' ? '' : value)
                         }
                         disabled={processing}
                     >
                         <SelectTrigger
                             className="w-40"
-                            aria-label="Filter by status"
+                            aria-label="Filter by operating day"
                         >
-                            <SelectValue placeholder="All statuses" />
+                            <SelectValue placeholder="All days" />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="all">All statuses</SelectItem>
-                            <SelectItem value="Active">Active</SelectItem>
-                            <SelectItem value="Inactive">Inactive</SelectItem>
+                            <SelectItem value="all">All days</SelectItem>
+                            {OPERATING_DAYS.map((day) => (
+                                <SelectItem key={day} value={day}>
+                                    {day}
+                                </SelectItem>
+                            ))}
                         </SelectContent>
                     </Select>
                     <Button
@@ -132,9 +146,9 @@ export default function WardsIndex({
                 </form>
 
                 <div className="ml-auto">
-                    {can('wards.create') && (
-                        <Link href={WardController.create.url()}>
-                            <Button variant="default">New ward</Button>
+                    {can('clinics.create') && (
+                        <Link href={ClinicController.create.url()}>
+                            <Button variant="default">New clinic</Button>
                         </Link>
                     )}
                 </div>
@@ -144,70 +158,60 @@ export default function WardsIndex({
                 <Table>
                     <TableHeader>
                         <TableRow>
-                            <TableHead className="w-[35%]">Ward</TableHead>
-                            <TableHead>Beds</TableHead>
+                            <TableHead className="w-[35%]">Clinic</TableHead>
+                            <TableHead>Days</TableHead>
                             <TableHead>Location</TableHead>
-                            <TableHead>Status</TableHead>
-                            <TableHead>Matron in charge</TableHead>
                             <TableHead>Actions</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {wards.map((ward) => (
-                            <TableRow key={ward.id}>
+                        {clinics.map((clinic) => (
+                            <TableRow key={clinic.id}>
                                 <TableCell>
                                     <div className="flex flex-col">
                                         <span className="font-medium">
-                                            {ward.name}
+                                            {clinic.name}
                                         </span>
                                         <span className="text-muted-foreground text-xs">
                                             Created{' '}
                                             {new Date(
-                                                ward.created_at,
+                                                clinic.created_at,
                                             ).toLocaleDateString()}
                                         </span>
                                     </div>
                                 </TableCell>
-                                <TableCell className="text-muted-foreground tabular-nums">
-                                    {ward.beds_count ?? '—'}
+                                <TableCell>
+                                    {clinic.operating_days.length > 0 ? (
+                                        <span
+                                            className="text-muted-foreground text-xs tabular-nums"
+                                            title={clinic.operating_days.join(
+                                                ', ',
+                                            )}
+                                        >
+                                            {formatDays(clinic.operating_days)}
+                                        </span>
+                                    ) : (
+                                        <span className="text-muted-foreground text-xs">
+                                            Not set
+                                        </span>
+                                    )}
                                 </TableCell>
                                 <TableCell>
-                                    {ward.location || (
+                                    {clinic.location || (
                                         <span className="text-muted-foreground text-xs">
                                             No location set
                                         </span>
                                     )}
                                 </TableCell>
                                 <TableCell>
-                                    <span
-                                        className={
-                                            'rounded-sm px-1.5 py-0.5 text-xs font-medium ' +
-                                            (ward.status === 'Active'
-                                                ? 'bg-green-50 text-green-700'
-                                                : 'bg-gray-100 text-gray-600')
-                                        }
-                                    >
-                                        {ward.status}
-                                    </span>
-                                </TableCell>
-                                <TableCell>
-                                    {ward.matron_in_charge ? (
-                                        <span>
-                                            {ward.matron_in_charge.name}
-                                        </span>
-                                    ) : (
-                                        <span className="text-muted-foreground text-xs">
-                                            Unassigned
-                                        </span>
-                                    )}
-                                </TableCell>
-                                <TableCell>
                                     <div className="flex items-center gap-1">
-                                        {can('wards.update') && (
+                                        {can('clinics.update') && (
                                             <Link
-                                                href={WardController.edit.url({
-                                                    ward: ward.id,
-                                                })}
+                                                href={ClinicController.edit.url(
+                                                    {
+                                                        clinic: clinic.id,
+                                                    },
+                                                )}
                                             >
                                                 <Button
                                                     variant="outline"
@@ -219,23 +223,23 @@ export default function WardsIndex({
                                                 </Button>
                                             </Link>
                                         )}
-                                        {can('wards.delete') && (
-                                            <WardDeleteDialog
-                                                wardId={ward.id}
-                                                wardLabel={ward.name}
+                                        {can('clinics.delete') && (
+                                            <ClinicDeleteDialog
+                                                clinicId={clinic.id}
+                                                clinicLabel={clinic.name}
                                             />
                                         )}
                                     </div>
                                 </TableCell>
                             </TableRow>
                         ))}
-                        {wards.length === 0 && (
+                        {clinics.length === 0 && (
                             <TableRow>
                                 <TableCell
-                                    colSpan={6}
+                                    colSpan={4}
                                     className="text-muted-foreground py-8 text-center text-sm"
                                 >
-                                    No wards found.
+                                    No clinics found.
                                 </TableCell>
                             </TableRow>
                         )}
@@ -251,12 +255,12 @@ export default function WardsIndex({
     );
 }
 
-function WardDeleteDialog({
-    wardId,
-    wardLabel,
+function ClinicDeleteDialog({
+    clinicId,
+    clinicLabel,
 }: {
-    wardId: string;
-    wardLabel: string;
+    clinicId: string;
+    clinicLabel: string;
 }) {
     return (
         <Dialog>
@@ -267,14 +271,14 @@ function WardDeleteDialog({
                 </Button>
             </DialogTrigger>
             <DialogContent>
-                <DialogTitle>Delete ward</DialogTitle>
+                <DialogTitle>Delete clinic</DialogTitle>
                 <DialogDescription>
-                    Are you sure you want to delete the &ldquo;{wardLabel}
-                    &rdquo; ward? This action cannot be undone.
+                    Are you sure you want to delete the &ldquo;{clinicLabel}
+                    &rdquo; clinic? This action cannot be undone.
                 </DialogDescription>
 
                 <Form
-                    {...WardController.destroy.form({ ward: wardId })}
+                    {...ClinicController.destroy.form({ clinic: clinicId })}
                     options={{ preserveScroll: true }}
                     className="space-y-4"
                 >
@@ -289,7 +293,7 @@ function WardDeleteDialog({
                                     variant="destructive"
                                     disabled={processing}
                                 >
-                                    Delete ward
+                                    Delete clinic
                                 </Button>
                             </DialogFooter>
                         </>
@@ -300,11 +304,11 @@ function WardDeleteDialog({
     );
 }
 
-WardsIndex.layout = {
+ClinicsIndex.layout = {
     breadcrumbs: [
         {
-            title: 'Wards',
-            href: WardController.index.url(),
+            title: 'Clinics',
+            href: ClinicController.index.url(),
         },
     ],
 };

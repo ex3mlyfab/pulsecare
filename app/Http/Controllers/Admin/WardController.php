@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Inertia\Response;
+use Throwable;
 
 class WardController extends Controller
 {
@@ -23,7 +24,7 @@ class WardController extends Controller
         Gate::authorize('wards.view', $request->user());
 
         $search = trim((string) $request->string('search'));
-        $status = $request->string('status');
+        $status = trim((string) $request->string('status'));
         $perPage = (int) $request->input('per_page', 10);
 
         $wards = Ward::query()
@@ -46,6 +47,7 @@ class WardController extends Controller
                 ->map(fn (Ward $ward) => [
                     'id' => $ward->id,
                     'name' => $ward->name,
+                    'beds_count' => $ward->beds_count,
                     'location' => $ward->location,
                     'status' => $ward->status->value,
                     'matron_in_charge' => $ward->matronInCharge ? [
@@ -91,6 +93,10 @@ class WardController extends Controller
     public function store(StoreWardRequest $request): RedirectResponse
     {
         $data = $request->validated();
+        $data['beds_count'] = $data['beds_count'] ?? null;
+        $data['beds_count'] = $data['beds_count'] !== null && $data['beds_count'] !== ''
+            ? (int) $data['beds_count']
+            : null;
 
         Ward::create($data);
 
@@ -110,6 +116,7 @@ class WardController extends Controller
             'ward' => [
                 'id' => $ward->id,
                 'name' => $ward->name,
+                'beds_count' => $ward->beds_count,
                 'location' => $ward->location,
                 'status' => $ward->status->value,
                 'matron_in_charge_id' => $ward->matron_in_charge_id,
@@ -127,6 +134,10 @@ class WardController extends Controller
     public function update(UpdateWardRequest $request, Ward $ward): RedirectResponse
     {
         $data = $request->validated();
+        $data['beds_count'] = $data['beds_count'] ?? null;
+        $data['beds_count'] = $data['beds_count'] !== null && $data['beds_count'] !== ''
+            ? (int) $data['beds_count']
+            : null;
 
         $ward->fill($data);
         $ward->save();
@@ -143,9 +154,15 @@ class WardController extends Controller
     {
         Gate::authorize('wards.delete', $request->user());
 
-        $ward->delete();
-
-        Inertia::flash('toast', ['type' => 'success', 'message' => __('Ward deleted.')]);
+        try {
+            $ward->delete();
+            Inertia::flash('toast', ['type' => 'success', 'message' => __('Ward deleted.')]);
+        } catch (Throwable $exception) {
+            Inertia::flash('toast', [
+                'type' => 'error',
+                'message' => __('Unable to delete ward. It may be referenced by other records.'),
+            ]);
+        }
 
         return to_route('admin.wards.index');
     }

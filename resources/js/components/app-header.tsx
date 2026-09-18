@@ -1,5 +1,6 @@
 import { Link, usePage } from '@inertiajs/react';
 import {
+    BarChart3,
     BookOpen,
     ChevronDown,
     Folder,
@@ -49,6 +50,7 @@ import { useCurrentUrl } from '@/hooks/use-current-url';
 import { useInitials } from '@/hooks/use-initials';
 import { cn, toUrl } from '@/lib/utils';
 import { dashboard } from '@/routes';
+import { index as recordStatsIndex } from '@/routes/record-stats';
 import type { BreadcrumbItem, NavItem } from '@/types';
 
 type Props = {
@@ -60,6 +62,11 @@ const mainNavItems: NavItem[] = [
         title: 'Dashboard',
         href: dashboard(),
         icon: LayoutGrid,
+    },
+    {
+        title: 'Record Stats',
+        href: recordStatsIndex(),
+        icon: BarChart3,
     },
 ];
 
@@ -92,6 +99,14 @@ const adminNavItems: NavItem[] = [
     {
         title: 'Wards',
         href: '/admin/wards',
+    },
+    {
+        title: 'Clinics',
+        href: '/admin/clinics',
+    },
+    {
+        title: 'Other Metrics',
+        href: '/admin/other-metrics',
     },
 ];
 
@@ -147,11 +162,7 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                         </div>
 
                                         <Collapsible
-                                            defaultOpen={isCurrentUrl(
-                                                '/admin',
-                                                undefined,
-                                                true,
-                                            )}
+                                            defaultOpen={false}
                                             className="flex flex-col"
                                         >
                                             <CollapsibleTrigger className="group focus-visible:ring-ring flex items-center space-x-2 rounded-sm py-1 text-left font-medium outline-none focus-visible:ring-2">

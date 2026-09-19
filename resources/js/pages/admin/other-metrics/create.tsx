@@ -46,7 +46,9 @@ export default function OtherMetricsCreate() {
 
         try {
             const response = await fetch(
-                OtherMetricController.checkName.url({ query: { name: trimmed } }),
+                OtherMetricController.checkName.url({
+                    query: { name: trimmed },
+                }),
                 { headers: { Accept: 'application/json' } },
             );
 
@@ -120,7 +122,7 @@ export default function OtherMetricsCreate() {
                             placeholder="e.g. Blood Pressure"
                             aria-invalid={Boolean(errors.name) || nameConflict}
                             aria-describedby={
-                                (errors.name || nameConflict)
+                                errors.name || nameConflict
                                     ? 'name-error'
                                     : undefined
                             }
@@ -129,7 +131,7 @@ export default function OtherMetricsCreate() {
                             {checkingName ? (
                                 <Loader2 className="text-muted-foreground size-4 animate-spin" />
                             ) : nameAvailable ? (
-                                <Check className="text-green-600 size-4" />
+                                <Check className="size-4 text-green-600" />
                             ) : nameConflict ? (
                                 <X className="text-destructive size-4" />
                             ) : null}
@@ -167,9 +169,7 @@ export default function OtherMetricsCreate() {
                 </div>
 
                 <div className="flex items-center gap-4">
-                    <Button disabled={processing || nameConflict}>
-                        Save
-                    </Button>
+                    <Button disabled={processing || nameConflict}>Save</Button>
                     <Link href={OtherMetricController.index.url()}>
                         <Button variant="secondary" type="button">
                             Cancel

@@ -7,13 +7,17 @@ use App\Http\Controllers\Admin\RecordStatController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\WardController;
+use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
 
 Route::inertia('/', 'welcome')->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::inertia('dashboard', 'dashboard')->name('dashboard');
+    Route::post('dashboard/attendance', [DashboardController::class, 'storeAttendance'])->name('dashboard.attendance.store');
+    Route::post('dashboard/metric-values', [DashboardController::class, 'storeMetricValue'])->name('dashboard.metric-values.store');
     Route::get('record-stats', [RecordStatController::class, 'index'])->name('record-stats.index');
+    Route::get('stats-report', [RecordStatController::class, 'report'])->name('stats-report.index');
     Route::post('record-stats', [RecordStatController::class, 'store'])->name('record-stats.store');
     Route::patch('record-stats/{record_stat}', [RecordStatController::class, 'update'])->name('record-stats.update');
 });

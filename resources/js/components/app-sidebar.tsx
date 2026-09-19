@@ -1,5 +1,12 @@
 import { Link } from '@inertiajs/react';
-import { BarChart3, BookOpen, FolderGit2, LayoutGrid, Settings } from 'lucide-react';
+import {
+    BarChart3,
+    BookOpen,
+    FileBarChart,
+    FolderGit2,
+    LayoutGrid,
+    Settings,
+} from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import { NavCollapsible } from '@/components/nav-collapsible';
 import { NavFooter } from '@/components/nav-footer';
@@ -16,6 +23,7 @@ import {
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
 import { index as recordStatsIndex } from '@/routes/record-stats';
+import { index as statsReportIndex } from '@/routes/stats-report';
 import { index as rolesIndex } from '@/routes/admin/roles';
 import { index as permissionsIndex } from '@/routes/admin/permissions';
 import { index as usersIndex } from '@/routes/admin/users';
@@ -32,6 +40,11 @@ const mainNavItems: NavItem[] = [
         title: 'Record Stats',
         href: recordStatsIndex().url,
         icon: BarChart3,
+    },
+    {
+        title: 'Stats Report',
+        href: statsReportIndex().url,
+        icon: FileBarChart,
     },
 ];
 

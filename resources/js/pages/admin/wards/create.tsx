@@ -152,7 +152,7 @@ export default function WardCreate({
                         <button
                             type="button"
                             id="matron_in_charge_id"
-                            className="border-input bg-background text-foreground hover:bg-accent focus:ring-ring flex h-9 w-full items-center justify-between rounded-sm border px-3 py-2 text-sm transition-colors focus:ring-1 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+                            className="border-input bg-background text-foreground hover:bg-accent hover:text-accent-foreground focus:ring-ring disabled:bg-muted disabled:text-muted-foreground/70 flex h-9 w-full items-center justify-between rounded-sm border px-3 py-2 text-sm transition-colors focus:ring-1 focus:outline-none disabled:cursor-not-allowed"
                             onClick={() => setMatronOpen((open) => !open)}
                             aria-expanded={matronOpen}
                             aria-haspopup="listbox"

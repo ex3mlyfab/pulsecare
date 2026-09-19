@@ -5,7 +5,7 @@ description: 'Non-obvious implementation patterns and gotchas specific to the Pu
 
 # PulseCare Inertia & CRUD Patterns
 
-This skill records the non-obvious patterns and bugs that have bitten this specific codebase. The generic Laravel/Inertia/Wayfinder skills cover the *syntax*; this covers the *gotchas* and the *conventions* that are easy to break.
+This skill records the non-obvious patterns and bugs that have bitten this specific codebase. The generic Laravel/Inertia/Wayfinder skills cover the _syntax_; this covers the _gotchas_ and the _conventions_ that are easy to break.
 
 ## When to Apply
 
@@ -70,12 +70,12 @@ if ($status !== '') { /* … */ }                 // correct
 
 **The trap.** In `@inertiajs/react` v3.7.0, a page component's `.layout` property accepts several shapes, and **exactly one of them crashes React with error #31** ("Element type is invalid: expected a string or class/function, but got: object with keys {breadcrumbs}"):
 
-| Shape | Valid? | Notes |
-|---|---|---|
-| `Component.layout = { breadcrumbs: [...] }` | ✅ | Static props object. Inertia merges it onto the default layout from the `layout:` resolver in `createInertiaApp`. Used by ~25 pages in this repo (index/create pages). |
-| `Component.layout = (child, props) => <Layout>{child}</Layout>` | ✅ | Render function **returning JSX**. Inertia calls it with `(child, props)` and renders the returned element. |
-| `Component.layout = function (…) { return { breadcrumbs: […] }; }` | ❌ **CRASH** | Function that **returns a plain object**. This is the ambiguous shape that leaks `{breadcrumbs}` into a `createElement` slot on the save→index redirect. |
-| `setLayoutProps({ breadcrumbs: […] })` inside the component body | ✅ | The supported way to pass **dynamic** (per-record) props to the default layout. Merged onto the `AppLayout` resolver. Reset on every new visit. |
+| Shape                                                              | Valid?       | Notes                                                                                                                                                                  |
+| ------------------------------------------------------------------ | ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Component.layout = { breadcrumbs: [...] }`                        | ✅           | Static props object. Inertia merges it onto the default layout from the `layout:` resolver in `createInertiaApp`. Used by ~25 pages in this repo (index/create pages). |
+| `Component.layout = (child, props) => <Layout>{child}</Layout>`    | ✅           | Render function **returning JSX**. Inertia calls it with `(child, props)` and renders the returned element.                                                            |
+| `Component.layout = function (…) { return { breadcrumbs: […] }; }` | ❌ **CRASH** | Function that **returns a plain object**. This is the ambiguous shape that leaks `{breadcrumbs}` into a `createElement` slot on the save→index redirect.               |
+| `setLayoutProps({ breadcrumbs: […] })` inside the component body   | ✅           | The supported way to pass **dynamic** (per-record) props to the default layout. Merged onto the `AppLayout` resolver. Reset on every new visit.                        |
 
 **The bug this produced.** Three edit pages used the function-returns-object form:
 
@@ -85,7 +85,10 @@ WardEdit.layout = function WardEditLayout({ ward }: { ward: Ward }) {
     return {
         breadcrumbs: [
             { title: 'Wards', href: WardController.index.url() },
-            { title: 'Edit ward', href: WardController.edit.url({ ward: ward.id }) },
+            {
+                title: 'Edit ward',
+                href: WardController.edit.url({ ward: ward.id }),
+            },
         ],
     };
 };
@@ -117,9 +120,11 @@ export default function WardEdit({ ward }: { ward: Ward }) {
 **Decision rule for new edit pages in this repo.**
 
 - If the breadcrumb is **static** (does not depend on the record's id), use the plain-object form matching the index page of the same resource:
-  ```tsx
-  WardIndex.layout = { breadcrumbs: [{ title: 'Wards', href: WardController.index.url() }] };
-  ```
+    ```tsx
+    WardIndex.layout = {
+        breadcrumbs: [{ title: 'Wards', href: WardController.index.url() }],
+    };
+    ```
 - If the breadcrumb is **dynamic** (depends on `record.id` for the "Edit …" href), use `setLayoutProps` inside the component body. **Do not** write a function that returns a plain object.
 
 ---
@@ -135,11 +140,11 @@ The FK column type **must match the referenced table's primary key type**, or My
 
 **What this repo has.**
 
-| Table | PK helper | PK type |
-|---|---|---|
-| `users` | `$table->id()` | `BIGINT UNSIGNED` (integer) |
-| `roles`, `permissions`, `passkeys`, `jobs` | `$table->id()` | `BIGINT UNSIGNED` |
-| `wards`, `clinics`, `other_metrics`, `record_stats` | `$table->ulid('id')->primary()` | `CHAR(26)` |
+| Table                                               | PK helper                       | PK type                     |
+| --------------------------------------------------- | ------------------------------- | --------------------------- |
+| `users`                                             | `$table->id()`                  | `BIGINT UNSIGNED` (integer) |
+| `roles`, `permissions`, `passkeys`, `jobs`          | `$table->id()`                  | `BIGINT UNSIGNED`           |
+| `wards`, `clinics`, `other_metrics`, `record_stats` | `$table->ulid('id')->primary()` | `CHAR(26)`                  |
 
 So:
 
@@ -181,17 +186,17 @@ Key points:
 - `Inertia::flash('toast', …)` stores a flash entry in the session keyed `toast`. It is **not** the same as Laravel's `session()->flash('toast', …)`. Inertia's `flash()` is what the client's `router.on('flash', …)` listener picks up.
 - The redirect target is **always** `to_route('<resource>.index')` — never `back()`, never `redirect()->to()`. This is what triggers the Inertia redirect-follow that re-renders the index with the new row.
 - For `destroy`, wrap the delete in a `try/catch` so a `QueryException` (e.g. FK constraint from `record_stats`) shows an error toast instead of a 500:
-  ```php
-  try {
-      $ward->delete();
-      Inertia::flash('toast', ['type' => 'success', 'message' => __('Ward deleted.')]);
-  } catch (Throwable $exception) {
-      Inertia::flash('toast', [
-          'type' => 'error',
-          'message' => __('Unable to delete ward. It may be referenced by other records.'),
-      ]);
-  }
-  ```
+    ```php
+    try {
+        $ward->delete();
+        Inertia::flash('toast', ['type' => 'success', 'message' => __('Ward deleted.')]);
+    } catch (Throwable $exception) {
+        Inertia::flash('toast', [
+            'type' => 'error',
+            'message' => __('Unable to delete ward. It may be referenced by other records.'),
+        ]);
+    }
+    ```
 
 **Client side.** The toast is rendered by `resources/js/components/ui/sonner.tsx` via the `useFlashToast` hook (`resources/js/hooks/use-flash-toast.ts`), which subscribes to `router.on('flash', …)` and calls `toast.success/info/warning/error` from `sonner`. The hook is wired into the `Toaster` component in `resources/js/app.tsx`. **Do not** add a second toast mechanism; if you need a new toast, just call `Inertia::flash('toast', …)` on the server.
 
@@ -204,14 +209,13 @@ Key points:
 **The convention.** Every create page in `resources/js/pages/admin/*/create.tsx` uses the same shape:
 
 ```tsx
-const { data, setData, post, processing, errors, reset } =
-    useForm<WardForm>({
-        name: '',
-        beds_count: '',
-        location: '',
-        status: 'Active',
-        matron_in_charge_id: '',
-    });
+const { data, setData, post, processing, errors, reset } = useForm<WardForm>({
+    name: '',
+    beds_count: '',
+    location: '',
+    status: 'Active',
+    matron_in_charge_id: '',
+});
 
 const submit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -270,7 +274,11 @@ Key points:
 ```tsx
 import WardController from '@/actions/App/Http/Controllers/Admin/WardController';
 // or, for tree-shaking:
-import { index, store, create } from '@/actions/App/Http/Controllers/Admin/WardController';
+import {
+    index,
+    store,
+    create,
+} from '@/actions/App/Http/Controllers/Admin/WardController';
 ```
 
 The generated module (`resources/js/actions/App/Http/Controllers/Admin/WardController.ts`) exposes, for each route method:
@@ -419,7 +427,7 @@ Key points:
 
 - **`#[Fillable([...])]`** is the attribute form (Laravel 13). Do not use `protected $fillable = [...]` in new models; match the existing style.
 - **`protected $keyType = 'string';`** and **`public $incrementing = false;`** are required so Eloquent does not try to auto-increment the PK.
-- **The `creating` hook generates the ULID** via `Symfony\Component\Uid\Ulid::generate()`. This is the project convention; the `HasUlids` trait mentioned in `AGENTS.md` is *not* used in this codebase.
+- **The `creating` hook generates the ULID** via `Symfony\Component\Uid\Ulid::generate()`. This is the project convention; the `HasUlids` trait mentioned in `AGENTS.md` is _not_ used in this codebase.
 - **Casts** include any enum column as `<EnumClass>::class`, any integer column as `'integer'`, and any FK as the matching SQL type (`'string'` for `foreignUlid`, `'integer'` for `foreignId`).
 
 **Factory + seeder.** When you create a new model, also create `database/factories/<Model>Factory.php` and a seeder if the resource is meant to have seed data. Match the existing `WardFactory` / `RecordStatFactory` shape:

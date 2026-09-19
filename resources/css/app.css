@@ -90,42 +90,42 @@
     --card-foreground: #0f172a;
     --popover: #ffffff;
     --popover-foreground: #0f172a;
-    --primary: #0d9488;
+    --primary: #0f766e;
     --primary-foreground: #ffffff;
-    --secondary: #0284c7;
+    --secondary: #0369a1;
     --secondary-foreground: #ffffff;
     --muted: #f1f5f9;
-    --muted-foreground: #64748b;
+    --muted-foreground: #334155;
     --accent: #f1f5f9;
     --accent-foreground: #0f172a;
-    --destructive: #ef4444;
+    --destructive: #dc2626;
     --destructive-foreground: #ffffff;
     --border: #e2e8f0;
-    --input: #cbd5e1;
-    --ring: #0d9488;
-    --chart-1: #0d9488;
-    --chart-2: #0284c7;
+    --input: #64748b;
+    --ring: #0f766e;
+    --chart-1: #0f766e;
+    --chart-2: #0369a1;
     --chart-3: #6366f1;
     --chart-4: #f59e0b;
     --chart-5: #10b981;
     --sidebar: #ffffff;
     --sidebar-foreground: #0f172a;
-    --sidebar-primary: #0d9488;
+    --sidebar-primary: #0f766e;
     --sidebar-primary-foreground: #ffffff;
     --sidebar-accent: #f1f5f9;
     --sidebar-accent-foreground: #0f172a;
     --sidebar-border: #e2e8f0;
-    --sidebar-ring: #0d9488;
-    --stable: #10b981;
+    --sidebar-ring: #0f766e;
+    --stable: #047857;
     --stable-surface: #ecfdf5;
     --stable-border: #a7f3d0;
-    --bottleneck: #f59e0b;
+    --bottleneck: #b45309;
     --bottleneck-surface: #fffbeb;
     --bottleneck-border: #fde68a;
-    --critical: #6366f1;
+    --critical: #4338ca;
     --critical-surface: #eef2ff;
     --critical-border: #c7d2fe;
-    --urgent: #ef4444;
+    --urgent: #b91c1c;
     --urgent-surface: #fef2f2;
     --urgent-border: #fecaca;
 }
@@ -184,6 +184,78 @@
 
     body {
         @apply bg-background text-foreground antialiased;
+        min-width: 320px;
+        font-size: 15px;
+        line-height: 1.5;
         font-variant-numeric: tabular-nums lining-nums;
+        font-weight: 400;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        font-weight: 600;
+        line-height: 1.2;
+        color: var(--foreground);
+        text-wrap: balance;
+    }
+
+    h1 {
+        font-size: 2rem;
+        line-height: 2.5rem;
+        font-weight: 700;
+    }
+
+    h2 {
+        font-size: 1.5rem;
+        line-height: 2rem;
+        font-weight: 700;
+    }
+
+    h3 {
+        font-size: 1.25rem;
+        line-height: 1.75rem;
+        font-weight: 700;
+    }
+
+    p {
+        text-wrap: pretty;
+    }
+
+    :where(a, button, [tabindex]) {
+        outline: none;
+    }
+
+    :where(
+        button,
+        a,
+        [role='button'],
+        [role='tab'],
+        input,
+        select,
+        [data-slot='input'],
+        [data-slot='checkbox']
+    ):focus-visible {
+        outline: 3px solid var(--ring);
+        outline-offset: 3px;
+    }
+
+    ::selection {
+        background: var(--primary);
+        color: var(--primary-foreground);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+            scroll-behavior: auto !important;
+            transition-duration: 0.01ms !important;
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+        }
     }
 }

@@ -40,7 +40,7 @@ test('admin can view the record stats index', function () {
         ->component('record-stats/index')
         ->where('date', Carbon::today()->format('d-M-Y'))
         ->has('activeWards', 2)
-        ->has('metrics', 11));
+        ->has('metrics', 12));
 });
 
 test('inactive wards are excluded from the index', function () {
@@ -248,8 +248,9 @@ test('the record stat total sums all metrics', function () {
         'sama' => 7,
         'abscond' => 0,
         'outpatients' => 8,
+        'inpatients' => 9,
         'death' => 2,
     ]);
 
-    $this->assertSame(48, $record->total());
+    $this->assertSame(57, $record->total());
 });

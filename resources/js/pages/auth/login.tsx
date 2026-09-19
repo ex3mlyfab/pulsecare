@@ -9,6 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
 import { store } from '@/routes/login';
 import { request } from '@/routes/password';
+import AuthStatusAlert from '@/components/auth-status-alert';
 import PasskeyVerify from '@/components/passkey-verify';
 
 type Props = {
@@ -24,8 +25,8 @@ export default function Login({ status, canResetPassword }: Props) {
             <PasskeyVerify />
 
             {status && (
-                <div className="mb-4 text-center text-sm font-medium text-green-600">
-                    {status}
+                <div className="mb-6">
+                    <AuthStatusAlert message={status} />
                 </div>
             )}
 

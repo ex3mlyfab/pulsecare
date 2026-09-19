@@ -26,11 +26,16 @@ type OtherMetricsForm = {
     status: string;
 };
 
-export default function OtherMetricsEdit({ otherMetric }: { otherMetric: OtherMetric }) {
-    const { data, setData, patch, processing, errors } = useForm<OtherMetricsForm>({
-        name: otherMetric.name,
-        status: otherMetric.status,
-    });
+export default function OtherMetricsEdit({
+    otherMetric,
+}: {
+    otherMetric: OtherMetric;
+}) {
+    const { data, setData, patch, processing, errors } =
+        useForm<OtherMetricsForm>({
+            name: otherMetric.name,
+            status: otherMetric.status,
+        });
 
     const [checkingName, setCheckingName] = useState(false);
     const [nameState, setNameState] = useState<'idle' | 'available' | 'exists'>(
@@ -87,9 +92,11 @@ export default function OtherMetricsEdit({ otherMetric }: { otherMetric: OtherMe
 
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
-        patch(OtherMetricController.update.url({
-            other_metric: otherMetric.id,
-        }));
+        patch(
+            OtherMetricController.update.url({
+                other_metric: otherMetric.id,
+            }),
+        );
     };
 
     setLayoutProps({
@@ -141,7 +148,7 @@ export default function OtherMetricsEdit({ otherMetric }: { otherMetric: OtherMe
                             autoComplete="off"
                             aria-invalid={Boolean(errors.name) || nameConflict}
                             aria-describedby={
-                                (errors.name || nameConflict)
+                                errors.name || nameConflict
                                     ? 'name-error'
                                     : undefined
                             }
@@ -150,7 +157,7 @@ export default function OtherMetricsEdit({ otherMetric }: { otherMetric: OtherMe
                             {checkingName ? (
                                 <Loader2 className="text-muted-foreground size-4 animate-spin" />
                             ) : nameAvailable ? (
-                                <Check className="text-green-600 size-4" />
+                                <Check className="size-4 text-green-600" />
                             ) : nameConflict ? (
                                 <X className="text-destructive size-4" />
                             ) : null}

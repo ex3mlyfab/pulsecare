@@ -16,6 +16,7 @@ import {
     DialogTrigger,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
 import {
     Select,
     SelectContent,
@@ -179,16 +180,15 @@ export default function WardsIndex({
                                     )}
                                 </TableCell>
                                 <TableCell>
-                                    <span
-                                        className={
-                                            'rounded-sm px-1.5 py-0.5 text-xs font-medium ' +
-                                            (ward.status === 'Active'
-                                                ? 'bg-green-50 text-green-700'
-                                                : 'bg-gray-100 text-gray-600')
+                                    <Badge
+                                        variant={
+                                            ward.status === 'Active'
+                                                ? 'success'
+                                                : 'outline'
                                         }
                                     >
                                         {ward.status}
-                                    </span>
+                                    </Badge>
                                 </TableCell>
                                 <TableCell>
                                     {ward.matron_in_charge ? (

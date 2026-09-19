@@ -68,6 +68,7 @@ class RbacSeeder extends Seeder
             'clinics' => ['view', 'create', 'update', 'delete'],
             'other_metrics' => ['view', 'create', 'update', 'delete'],
             'record_stats' => ['view', 'create', 'update', 'delete'],
+            'dashboard' => ['view', 'update'],
         ];
     }
 
@@ -88,6 +89,7 @@ class RbacSeeder extends Seeder
                 ->filter(fn (string $permission) => str_starts_with($permission, 'users.'))
                 ->filter(fn (string $permission) => str_ends_with($permission, '.view'))
                 ->values()
+                ->push('dashboard.view')
                 ->all(),
         ];
     }

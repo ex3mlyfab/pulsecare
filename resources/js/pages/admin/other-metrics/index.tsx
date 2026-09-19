@@ -78,9 +78,28 @@ export default function OtherMetricsIndex({
             />
 
             <div className="mb-6 grid gap-3 sm:grid-cols-3">
-                <MetricSummary label="Total metrics" value={pagination.total} icon={Activity} tone="primary" />
-                <MetricSummary label="Active" value={otherMetrics.filter((metric) => metric.status === 'Active').length} icon={CheckCircle2} tone="stable" />
-                <MetricSummary label="Showing" value={otherMetrics.length} icon={Search} tone="secondary" />
+                <MetricSummary
+                    label="Total metrics"
+                    value={pagination.total}
+                    icon={Activity}
+                    tone="primary"
+                />
+                <MetricSummary
+                    label="Active"
+                    value={
+                        otherMetrics.filter(
+                            (metric) => metric.status === 'Active',
+                        ).length
+                    }
+                    icon={CheckCircle2}
+                    tone="stable"
+                />
+                <MetricSummary
+                    label="Showing"
+                    value={otherMetrics.length}
+                    icon={Search}
+                    tone="secondary"
+                />
             </div>
 
             <div className="border-border bg-muted/50 mb-6 flex flex-wrap items-center gap-3 rounded-lg border p-3">
@@ -170,7 +189,9 @@ export default function OtherMetricsIndex({
                                                 : 'border-border bg-muted text-muted-foreground')
                                         }
                                     >
-                                        <span className={`size-1.5 rounded-full ${otherMetric.status === 'Active' ? 'bg-stable' : 'bg-muted-foreground'}`} />
+                                        <span
+                                            className={`size-1.5 rounded-full ${otherMetric.status === 'Active' ? 'bg-stable' : 'bg-muted-foreground'}`}
+                                        />
                                         {otherMetric.status}
                                     </span>
                                 </TableCell>
@@ -178,13 +199,12 @@ export default function OtherMetricsIndex({
                                     <div className="flex items-center gap-1">
                                         {can('other_metrics.update') && (
                                             <Link
-                                                href={
-                                                    OtherMetricController.edit
-                                                        .url({
-                                                            other_metric:
-                                                                otherMetric.id,
-                                                        })
-                                                }
+                                                href={OtherMetricController.edit.url(
+                                                    {
+                                                        other_metric:
+                                                            otherMetric.id,
+                                                    },
+                                                )}
                                             >
                                                 <Button
                                                     variant="outline"
@@ -230,12 +250,33 @@ export default function OtherMetricsIndex({
     );
 }
 
-function MetricSummary({ label, value, icon: Icon, tone }: { label: string; value: number; icon: typeof Activity; tone: 'primary' | 'stable' | 'secondary' }) {
-    const toneClass = { primary: 'bg-primary/10 text-primary', stable: 'bg-stable-surface text-stable', secondary: 'bg-secondary/10 text-secondary' }[tone];
+function MetricSummary({
+    label,
+    value,
+    icon: Icon,
+    tone,
+}: {
+    label: string;
+    value: number;
+    icon: typeof Activity;
+    tone: 'primary' | 'stable' | 'secondary';
+}) {
+    const toneClass = {
+        primary: 'bg-primary/10 text-primary',
+        stable: 'bg-stable-surface text-stable',
+        secondary: 'bg-secondary/10 text-secondary',
+    }[tone];
     return (
-        <div className="border-border bg-card flex items-center gap-3 rounded-lg border p-4 shadow-layer-1">
-            <span className={`rounded-md p-2 ${toneClass}`}><Icon className="size-4" /></span>
-            <div><p className="text-muted-foreground text-xs font-semibold tracking-[0.1em] uppercase">{label}</p><p className="mt-1 text-2xl font-bold tabular-nums">{value}</p></div>
+        <div className="border-border bg-card shadow-layer-1 flex items-center gap-3 rounded-lg border p-4">
+            <span className={`rounded-md p-2 ${toneClass}`}>
+                <Icon className="size-4" />
+            </span>
+            <div>
+                <p className="text-muted-foreground text-xs font-semibold tracking-[0.1em] uppercase">
+                    {label}
+                </p>
+                <p className="mt-1 text-2xl font-bold tabular-nums">{value}</p>
+            </div>
         </div>
     );
 }

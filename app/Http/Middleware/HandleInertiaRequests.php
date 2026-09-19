@@ -47,7 +47,8 @@ class HandleInertiaRequests extends Middleware
                     || str_starts_with($permission, 'wards.')
                     || str_starts_with($permission, 'clinics.')
                     || str_starts_with($permission, 'other_metrics.')
-                    || str_starts_with($permission, 'record_stats.'))
+                    || str_starts_with($permission, 'record_stats.')
+                    || str_starts_with($permission, 'dashboard.'))
                 ->values()
                 ->all()
             : [];

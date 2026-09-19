@@ -14,6 +14,7 @@ enum StatMetric: string
     case Sama = 'sama';
     case Abscond = 'abscond';
     case Outpatients = 'outpatients';
+    case Inpatients = 'inpatients';
     case Death = 'death';
 
     /**
@@ -32,6 +33,7 @@ enum StatMetric: string
             self::Sama => 'SAMA',
             self::Abscond => 'Abscond',
             self::Outpatients => 'Outpatients',
+            self::Inpatients => 'Inpatients',
             self::Death => 'Death',
         };
     }

@@ -3,6 +3,7 @@ import {
     BarChart3,
     BookOpen,
     ChevronDown,
+    FileBarChart,
     Folder,
     LayoutGrid,
     Menu,
@@ -51,6 +52,7 @@ import { useInitials } from '@/hooks/use-initials';
 import { cn, toUrl } from '@/lib/utils';
 import { dashboard } from '@/routes';
 import { index as recordStatsIndex } from '@/routes/record-stats';
+import { index as statsReportIndex } from '@/routes/stats-report';
 import type { BreadcrumbItem, NavItem } from '@/types';
 
 type Props = {
@@ -67,6 +69,11 @@ const mainNavItems: NavItem[] = [
         title: 'Record Stats',
         href: recordStatsIndex(),
         icon: BarChart3,
+    },
+    {
+        title: 'Stats Report',
+        href: statsReportIndex(),
+        icon: FileBarChart,
     },
 ];
 
@@ -110,7 +117,8 @@ const adminNavItems: NavItem[] = [
     },
 ];
 
-const activeItemStyles = 'text-foreground dark:bg-card dark:text-foreground';
+const activeItemStyles =
+    'bg-primary/10 text-primary font-semibold dark:bg-primary/20 dark:text-primary';
 
 export function AppHeader({ breadcrumbs = [] }: Props) {
     const page = usePage();
@@ -120,7 +128,7 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
 
     return (
         <>
-            <div className="border-sidebar-border/80 border-b">
+            <div className="border-sidebar-border/80 bg-card shadow-layer-1 border-b">
                 <div className="mx-auto flex h-16 items-center px-4 md:max-w-7xl">
                     {/* Mobile Menu */}
                     <div className="lg:hidden">
@@ -142,7 +150,7 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                     Navigation menu
                                 </SheetTitle>
                                 <SheetHeader className="flex justify-start text-left">
-                                    <AppLogoIcon className="h-6 w-6 fill-current text-black dark:text-white" />
+                                    <AppLogoIcon className="text-foreground dark:text-foreground h-6 w-6 fill-current" />
                                 </SheetHeader>
                                 <div className="flex h-full flex-1 flex-col space-y-4 p-4">
                                     <div className="flex h-full flex-col justify-between text-sm">
@@ -151,7 +159,13 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                                 <Link
                                                     key={item.title}
                                                     href={item.href}
-                                                    className="flex items-center space-x-2 font-medium"
+                                                    className={cn(
+                                                        'hover:bg-accent hover:text-accent-foreground flex items-center space-x-2 rounded-sm px-2 py-1.5 text-sm font-medium transition-colors',
+                                                        isCurrentUrl(
+                                                            item.href,
+                                                        ) &&
+                                                            'bg-primary/10 text-primary font-semibold',
+                                                    )}
                                                 >
                                                     {item.icon && (
                                                         <item.icon className="h-5 w-5" />
@@ -165,21 +179,22 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                             defaultOpen={false}
                                             className="flex flex-col"
                                         >
-                                            <CollapsibleTrigger className="group focus-visible:ring-ring flex items-center space-x-2 rounded-sm py-1 text-left font-medium outline-none focus-visible:ring-2">
+                                            <CollapsibleTrigger className="group focus-visible:ring-ring hover:bg-accent hover:text-accent-foreground flex items-center space-x-2 rounded-sm px-2 py-1.5 text-left text-sm font-medium transition-colors outline-none focus-visible:ring-2 focus-visible:ring-offset-2">
                                                 <Shield className="h-5 w-5" />
                                                 <span>App Admin</span>
                                                 <ChevronDown className="ml-auto h-4 w-4 transition-transform duration-200 group-data-[state=open]:rotate-180" />
                                             </CollapsibleTrigger>
-                                            <CollapsibleContent className="border-sidebar-border mt-2 flex flex-col space-y-2 border-l pl-7">
+                                            <CollapsibleContent className="border-sidebar-border mt-2 flex flex-col space-y-1 border-l pl-7">
                                                 {adminNavItems.map((item) => (
                                                     <Link
                                                         key={item.title}
                                                         href={item.href}
                                                         className={cn(
-                                                            'hover:text-primary rounded-sm py-1 font-medium',
+                                                            'hover:bg-accent hover:text-accent-foreground focus-visible:ring-ring rounded-sm px-2 py-1.5 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:outline-none',
                                                             isCurrentUrl(
                                                                 item.href,
-                                                            ) && 'text-primary',
+                                                            ) &&
+                                                                'bg-primary/10 text-primary font-semibold',
                                                         )}
                                                     >
                                                         {item.title}
@@ -195,7 +210,7 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                                     href={toUrl(item.href)}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
-                                                    className="flex items-center space-x-2 font-medium"
+                                                    className="hover:bg-accent hover:text-accent-foreground flex items-center space-x-2 rounded-sm px-2 py-1.5 text-sm font-medium transition-colors"
                                                 >
                                                     {item.icon && (
                                                         <item.icon className="h-5 w-5" />
@@ -235,7 +250,7 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                                     item.href,
                                                     activeItemStyles,
                                                 ),
-                                                'h-9 cursor-pointer px-3',
+                                                'hover:bg-accent hover:text-accent-foreground focus-visible:ring-ring h-9 cursor-pointer px-3 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none',
                                             )}
                                         >
                                             {item.icon && (
@@ -244,7 +259,10 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                             {item.title}
                                         </Link>
                                         {isCurrentUrl(item.href) && (
-                                            <div className="bg-primary dark:bg-primary absolute bottom-0 left-0 h-0.5 w-full translate-y-px"></div>
+                                            <div
+                                                className="bg-primary dark:bg-primary absolute bottom-0 left-0 h-0.5 w-full translate-y-px"
+                                                aria-hidden="true"
+                                            />
                                         )}
                                     </NavigationMenuItem>
                                 ))}
@@ -258,20 +276,26 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                             undefined,
                                             true,
                                         ) && activeItemStyles,
-                                        'h-9 cursor-pointer px-3',
+                                        'hover:bg-accent hover:text-accent-foreground focus-visible:ring-ring h-9 cursor-pointer px-3 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none',
                                     )}
                                 >
                                     <Shield className="mr-2 h-4 w-4" />
                                     App Admin
                                 </NavigationMenuTrigger>
                                 <NavigationMenuContent>
-                                    <ul className="grid w-[200px] gap-2 p-2">
+                                    <ul className="grid w-[200px] gap-1 p-2">
                                         {adminNavItems.map((item) => (
                                             <li key={item.title}>
                                                 <NavigationMenuLink asChild>
                                                     <Link
                                                         href={item.href}
-                                                        className="hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground block rounded-sm px-3 py-2 text-sm font-medium select-none"
+                                                        className={cn(
+                                                            'hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus-visible:ring-ring block rounded-sm px-3 py-2 text-sm font-medium transition-colors select-none focus-visible:ring-2 focus-visible:outline-none',
+                                                            isCurrentUrl(
+                                                                item.href,
+                                                            ) &&
+                                                                'bg-primary/10 text-primary font-semibold',
+                                                        )}
                                                     >
                                                         {item.title}
                                                     </Link>
@@ -301,13 +325,13 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                                 href={toUrl(item.href)}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
-                                                className="group text-accent-foreground ring-offset-background hover:bg-accent hover:text-accent-foreground focus-visible:ring-ring inline-flex h-9 w-9 items-center justify-center rounded-sm bg-transparent p-0 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50"
+                                                className="group ring-offset-background hover:bg-accent hover:text-accent-foreground focus-visible:ring-ring disabled:bg-muted disabled:text-muted-foreground/70 inline-flex h-9 w-9 items-center justify-center rounded-sm bg-transparent p-0 transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:pointer-events-none"
                                             >
                                                 <span className="sr-only">
                                                     {item.title}
                                                 </span>
                                                 {item.icon && (
-                                                    <item.icon className="size-5 opacity-80 group-hover:opacity-100" />
+                                                    <item.icon className="size-5 opacity-90 transition-opacity group-hover:opacity-100" />
                                                 )}
                                             </a>
                                         </TooltipTrigger>
@@ -346,7 +370,7 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
             </div>
             {breadcrumbs.length > 1 && (
                 <div className="border-sidebar-border/70 flex w-full border-b">
-                    <div className="text-muted-foreground mx-auto flex h-12 w-full items-center justify-start px-4 md:max-w-7xl">
+                    <div className="text-foreground mx-auto flex h-12 w-full items-center justify-start px-4 md:max-w-7xl">
                         <Breadcrumbs breadcrumbs={breadcrumbs} />
                     </div>
                 </div>

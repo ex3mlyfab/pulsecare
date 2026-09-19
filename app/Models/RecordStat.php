@@ -9,10 +9,9 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Support\Carbon;
 use Symfony\Component\Uid\Ulid;
 
-#[Fillable(['stat_date', 'ward_id', 'admission', 'discharges', 'trans_in', 'trans_out', 'referred_out', 'referred_in', 'emergencies', 'sama', 'abscond', 'outpatients', 'death'])]
+#[Fillable(['stat_date', 'ward_id', 'admission', 'discharges', 'trans_in', 'trans_out', 'referred_out', 'referred_in', 'emergencies', 'sama', 'abscond', 'outpatients', 'inpatients', 'death'])]
 class RecordStat extends Model
 {
     /** @use HasFactory<RecordStatFactory> */
@@ -45,12 +44,13 @@ class RecordStat extends Model
             'sama' => 'integer',
             'abscond' => 'integer',
             'outpatients' => 'integer',
+            'inpatients' => 'integer',
             'death' => 'integer',
         ];
     }
 
     /**
-     * The 11 recordable metric column names, in display order.
+     * The 12 recordable metric column names, in display order.
      *
      * @return list<string>
      */
@@ -66,9 +66,9 @@ class RecordStat extends Model
      *
      * @return Builder<static>
      */
-    public function scopeForDate(Builder $query, Carbon $date): Builder
+    public function scopeForDate(Builder $query, \DateTimeInterface $date): Builder
     {
-        return $query->whereDate('stat_date', $date->toDateString());
+        return $query->whereDate('stat_date', $date->format('Y-m-d'));
     }
 
     public function ward(): BelongsTo

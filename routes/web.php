@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Route;
 Route::inertia('/', 'welcome')->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::inertia('dashboard', 'dashboard')->name('dashboard');
+    Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::post('dashboard/attendance', [DashboardController::class, 'storeAttendance'])->name('dashboard.attendance.store');
     Route::post('dashboard/metric-values', [DashboardController::class, 'storeMetricValue'])->name('dashboard.metric-values.store');
     Route::get('record-stats', [RecordStatController::class, 'index'])->name('record-stats.index');

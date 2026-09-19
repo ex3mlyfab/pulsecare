@@ -91,7 +91,7 @@ export default function WardsIndex({
             <div className="mb-6 flex flex-wrap items-center gap-3">
                 <form
                     onSubmit={submitFilters}
-                    className="flex w-full flex-wrap items-center gap-3 sm:max-w-xl"
+                    className="flex w-full flex-wrap items-center gap-3 rounded-xl border border-border bg-card p-3 shadow-layer-1 sm:max-w-xl"
                 >
                     <div className="relative min-w-48 flex-1">
                         <Search className="text-muted-foreground pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2" />
@@ -124,8 +124,8 @@ export default function WardsIndex({
                     </Select>
                     <Button
                         type="submit"
-                        variant="secondary"
                         size="sm"
+                        className="font-semibold shadow-xs"
                         disabled={processing}
                     >
                         Filter
@@ -135,25 +135,26 @@ export default function WardsIndex({
                 <div className="ml-auto">
                     {can('wards.create') && (
                         <Link href={WardController.create.url()}>
-                            <Button variant="default">New ward</Button>
+                            <Button variant="default" className="font-semibold shadow-xs">New ward</Button>
                         </Link>
                     )}
                 </div>
             </div>
 
             <div className="space-y-4">
-                <Table>
-                    <TableHeader>
-                        <TableRow>
-                            <TableHead className="w-[35%]">Ward</TableHead>
-                            <TableHead>Beds</TableHead>
-                            <TableHead>Location</TableHead>
-                            <TableHead>Status</TableHead>
-                            <TableHead>Matron in charge</TableHead>
-                            <TableHead>Actions</TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
+                <div className="border-border bg-card shadow-layer-1 overflow-hidden rounded-xl border">
+                    <Table>
+                        <TableHeader>
+                            <TableRow className="bg-muted/70 hover:bg-muted/70 border-b border-border">
+                                <TableHead className="w-[35%] font-bold text-foreground uppercase tracking-wider pl-4">Ward</TableHead>
+                                <TableHead className="font-bold text-foreground uppercase tracking-wider">Beds</TableHead>
+                                <TableHead className="font-bold text-foreground uppercase tracking-wider">Location</TableHead>
+                                <TableHead className="font-bold text-foreground uppercase tracking-wider">Status</TableHead>
+                                <TableHead className="font-bold text-foreground uppercase tracking-wider">Matron in charge</TableHead>
+                                <TableHead className="font-bold text-foreground uppercase tracking-wider pr-4">Actions</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
                         {wards.map((ward) => (
                             <TableRow key={ward.id}>
                                 <TableCell>
@@ -241,6 +242,7 @@ export default function WardsIndex({
                         )}
                     </TableBody>
                 </Table>
+                </div>
 
                 <Pagination
                     meta={pagination}

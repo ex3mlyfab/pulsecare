@@ -87,7 +87,7 @@ export default function PermissionsIndex({
                     </div>
                     <Button
                         type="submit"
-                        variant="secondary"
+                        variant="default"
                         size="sm"
                         disabled={processing}
                     >
@@ -105,17 +105,18 @@ export default function PermissionsIndex({
             </div>
 
             <div className="space-y-4">
-                <Table>
-                    <TableHeader>
-                        <TableRow>
-                            <TableHead className="w-[40%]">
-                                Permission
-                            </TableHead>
-                            <TableHead>Guard</TableHead>
-                            <TableHead>Roles</TableHead>
-                            <TableHead>Actions</TableHead>
-                        </TableRow>
-                    </TableHeader>
+                <div className="border-border bg-card shadow-layer-1 rounded-lg border overflow-hidden">
+                    <Table>
+                        <TableHeader className="bg-muted/50 border-b border-border">
+                            <TableRow>
+                                <TableHead className="w-[40%] font-bold uppercase text-xs tracking-wider text-muted-foreground">
+                                    Permission
+                                </TableHead>
+                                <TableHead className="font-bold uppercase text-xs tracking-wider text-muted-foreground">Guard</TableHead>
+                                <TableHead className="font-bold uppercase text-xs tracking-wider text-muted-foreground">Roles</TableHead>
+                                <TableHead className="font-bold uppercase text-xs tracking-wider text-muted-foreground">Actions</TableHead>
+                            </TableRow>
+                        </TableHeader>
                     <TableBody>
                         {permissions.map((permission) => (
                             <TableRow key={permission.id}>
@@ -180,6 +181,7 @@ export default function PermissionsIndex({
                         )}
                     </TableBody>
                 </Table>
+                </div>
 
                 <Pagination
                     meta={pagination}

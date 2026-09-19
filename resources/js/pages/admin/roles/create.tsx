@@ -46,7 +46,12 @@ export default function RoleCreate({
                 description="Create a role and assign permissions to it"
             />
 
-            <form onSubmit={submit} className="space-y-6">
+            <div className="border-border bg-card shadow-layer-1 max-w-2xl rounded-lg border overflow-hidden">
+                <div className="border-b border-border border-t-4 border-t-primary bg-muted/60 px-6 py-5">
+                    <h2 className="headline-sm font-bold text-foreground">Role Details</h2>
+                    <p className="body-sm text-muted-foreground mt-0.5">Name this role and assign the permissions it grants.</p>
+                </div>
+                <form onSubmit={submit} className="p-6 space-y-6">
                 <div className="grid gap-2">
                     <Label htmlFor="name">Role name</Label>
                     <Input
@@ -99,7 +104,8 @@ export default function RoleCreate({
                     </Link>
                 </div>
             </form>
-        </>
+        </div>
+    </>
     );
 }
 

@@ -101,7 +101,7 @@ export default function ClinicsIndex({
             <div className="mb-6 flex flex-wrap items-center gap-3">
                 <form
                     onSubmit={submitFilters}
-                    className="flex w-full flex-wrap items-center gap-3 sm:max-w-xl"
+                    className="flex w-full flex-wrap items-center gap-3 rounded-xl border border-border bg-card p-3 shadow-layer-1 sm:max-w-xl"
                 >
                     <div className="relative min-w-48 flex-1">
                         <Search className="text-muted-foreground pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2" />
@@ -137,7 +137,7 @@ export default function ClinicsIndex({
                     </Select>
                     <Button
                         type="submit"
-                        variant="secondary"
+                        variant="default"
                         size="sm"
                         disabled={processing}
                     >
@@ -155,15 +155,16 @@ export default function ClinicsIndex({
             </div>
 
             <div className="space-y-4">
-                <Table>
-                    <TableHeader>
-                        <TableRow>
-                            <TableHead className="w-[35%]">Clinic</TableHead>
-                            <TableHead>Days</TableHead>
-                            <TableHead>Location</TableHead>
-                            <TableHead>Actions</TableHead>
-                        </TableRow>
-                    </TableHeader>
+                <div className="border-border bg-card shadow-layer-1 overflow-hidden rounded-xl border">
+                    <Table>
+                        <TableHeader className="bg-muted/50 border-b border-border">
+                            <TableRow>
+                                <TableHead className="w-[35%] font-bold uppercase text-xs tracking-wider text-muted-foreground">Clinic</TableHead>
+                                <TableHead className="font-bold uppercase text-xs tracking-wider text-muted-foreground">Days</TableHead>
+                                <TableHead className="font-bold uppercase text-xs tracking-wider text-muted-foreground">Location</TableHead>
+                                <TableHead className="font-bold uppercase text-xs tracking-wider text-muted-foreground">Actions</TableHead>
+                            </TableRow>
+                        </TableHeader>
                     <TableBody>
                         {clinics.map((clinic) => (
                             <TableRow key={clinic.id}>
@@ -245,6 +246,7 @@ export default function ClinicsIndex({
                         )}
                     </TableBody>
                 </Table>
+                </div>
 
                 <Pagination
                     meta={pagination}

@@ -10,6 +10,7 @@ import {
     Search,
 } from 'lucide-react';
 import Heading from '@/components/heading';
+import statsReport from '@/routes/stats-report';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -23,6 +24,7 @@ import {
     Table,
     TableBody,
     TableCell,
+    TableFooter,
     TableHead,
     TableHeader,
     TableRow,
@@ -233,9 +235,9 @@ export default function StatsReportIndex({
     const allDates = collectDateKeys(wardSeries, clinicSeries, metricSeries);
 
     const totals = {
-        wards: wardReport.reduce((sum, row) => sum + row.grand_total, 0),
-        clinics: clinicReport.reduce((sum, row) => sum + row.total, 0),
-        metrics: otherMetricReport.reduce((sum, row) => sum + row.total, 0),
+        wards: wardFiltered.reduce((sum, row) => sum + row.grand_total, 0),
+        clinics: clinicFiltered.reduce((sum, row) => sum + row.total, 0),
+        metrics: metricFiltered.reduce((sum, row) => sum + row.total, 0),
     };
 
     const rangeLabel =
@@ -261,18 +263,14 @@ export default function StatsReportIndex({
 
             <form
                 onSubmit={submitFilters}
-                className="border-border bg-card shadow-layer-1 mb-6 rounded-lg border p-4"
+                className="border-border bg-card shadow-layer-1 mb-6 rounded-xl border p-4 sm:p-5"
             >
                 <div className="flex flex-wrap items-end gap-3">
                     <Field label="From">
                         <Input
                             type="date"
                             value={data.date_from}
-                            min={
-                                filters.date_to !== ''
-                                    ? filters.date_to
-                                    : undefined
-                            }
+                            max={data.date_to || undefined}
                             onChange={(e) =>
                                 setData('date_from', e.target.value)
                             }
@@ -283,6 +281,7 @@ export default function StatsReportIndex({
                         <Input
                             type="date"
                             value={data.date_to}
+                            min={data.date_from || undefined}
                             onChange={(e) => setData('date_to', e.target.value)}
                             disabled={processing}
                         />
@@ -385,8 +384,8 @@ export default function StatsReportIndex({
                     <div className="ml-auto flex items-center gap-2">
                         <Button
                             type="submit"
-                            variant="secondary"
                             size="sm"
+                            className="font-semibold shadow-xs"
                             disabled={processing}
                         >
                             Apply
@@ -409,9 +408,9 @@ export default function StatsReportIndex({
                     <span>
                         {rangeLabel} · {allDates.length} day
                         {allDates.length === 1 ? '' : 's'} ·{' '}
-                        {wardReport.length +
-                            clinicReport.length +
-                            otherMetricReport.length}{' '}
+                        {wardFiltered.length +
+                            clinicFiltered.length +
+                            metricFiltered.length}{' '}
                         series
                     </span>
                     <span className="ml-auto flex gap-1">
@@ -584,10 +583,23 @@ function Kpi({
         critical: 'text-critical',
     }[tone];
 
+    const dotClass = {
+        primary: 'bg-primary',
+        secondary: 'bg-secondary',
+        critical: 'bg-critical',
+    }[tone];
+
     return (
-        <div className="border-border bg-card shadow-layer-1 rounded-lg border p-4">
-            <p className="label-md text-muted-foreground">{label}</p>
-            <div className={`tabular-kpi mt-2 ${toneClass}`}>{value}</div>
+        <div className="border-border bg-card shadow-layer-1 rounded-lg border p-4 sm:p-5 flex flex-col justify-between">
+            <div className="flex items-center justify-between">
+                <p className="label-sm uppercase tracking-wider font-semibold text-muted-foreground">
+                    {label}
+                </p>
+                <span className={`size-2 rounded-full ${dotClass}`} />
+            </div>
+            <div className={`tabular-kpi text-3xl font-bold mt-2 ${toneClass}`}>
+                {value}
+            </div>
         </div>
     );
 }
@@ -982,6 +994,17 @@ function WardTable({
     rows: WardReportRow[];
     metrics: MetricDefinition[];
 }) {
+    const metricTotals = useMemo(() => {
+        const totalsMap: Record<string, number> = {};
+        for (const metric of metrics) {
+            totalsMap[metric.key] = rows.reduce(
+                (sum, row) => sum + (row.totals[metric.key] ?? 0),
+                0,
+            );
+        }
+        return totalsMap;
+    }, [rows, metrics]);
+
     return (
         <div className="border-border bg-card shadow-layer-1 rounded-lg border">
             <div className="border-border/70 border-b px-4 py-3">
@@ -1000,9 +1023,6 @@ function WardTable({
                                     {metric.label}
                                 </TableHead>
                             ))}
-                            <TableHead className="label-sm text-right">
-                                Total
-                            </TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -1024,15 +1044,12 @@ function WardTable({
                                         {row.totals[metric.key] ?? 0}
                                     </TableCell>
                                 ))}
-                                <TableCell className="tabular-dense text-right font-semibold">
-                                    {row.grand_total}
-                                </TableCell>
                             </TableRow>
                         ))}
                         {rows.length === 0 && (
                             <TableRow>
                                 <TableCell
-                                    colSpan={metrics.length + 2}
+                                    colSpan={metrics.length + 1}
                                     className="text-muted-foreground body-sm py-8 text-center"
                                 >
                                     No ward movements in this range.
@@ -1040,6 +1057,23 @@ function WardTable({
                             </TableRow>
                         )}
                     </TableBody>
+                    {rows.length > 0 && (
+                        <TableFooter>
+                            <TableRow className="border-border bg-muted/60 border-t-2 font-semibold">
+                                <TableCell className="body-md text-foreground font-semibold">
+                                    Total
+                                </TableCell>
+                                {metrics.map((metric) => (
+                                    <TableCell
+                                        key={metric.key}
+                                        className="tabular-dense text-foreground text-right font-semibold"
+                                    >
+                                        {metricTotals[metric.key] ?? 0}
+                                    </TableCell>
+                                ))}
+                            </TableRow>
+                        </TableFooter>
+                    )}
                 </Table>
             </div>
         </div>
@@ -1047,6 +1081,11 @@ function WardTable({
 }
 
 function ClinicTable({ rows }: { rows: ClinicReportRow[] }) {
+    const total = useMemo(
+        () => rows.reduce((sum, row) => sum + row.total, 0),
+        [rows],
+    );
+
     return (
         <div className="border-border bg-card shadow-layer-1 rounded-lg border">
             <div className="border-border/70 border-b px-4 py-3">
@@ -1085,12 +1124,29 @@ function ClinicTable({ rows }: { rows: ClinicReportRow[] }) {
                         </TableRow>
                     )}
                 </TableBody>
+                {rows.length > 0 && (
+                    <TableFooter>
+                        <TableRow className="border-border bg-muted/60 border-t-2 font-semibold">
+                            <TableCell className="body-md text-foreground font-semibold">
+                                Total
+                            </TableCell>
+                            <TableCell className="tabular-dense text-foreground text-right font-semibold">
+                                {total}
+                            </TableCell>
+                        </TableRow>
+                    </TableFooter>
+                )}
             </Table>
         </div>
     );
 }
 
 function OtherMetricTable({ rows }: { rows: OtherMetricReportRow[] }) {
+    const total = useMemo(
+        () => rows.reduce((sum, row) => sum + row.total, 0),
+        [rows],
+    );
+
     return (
         <div className="border-border bg-card shadow-layer-1 rounded-lg border">
             <div className="border-border/70 border-b px-4 py-3">
@@ -1127,6 +1183,18 @@ function OtherMetricTable({ rows }: { rows: OtherMetricReportRow[] }) {
                         </TableRow>
                     )}
                 </TableBody>
+                {rows.length > 0 && (
+                    <TableFooter>
+                        <TableRow className="border-border bg-muted/60 border-t-2 font-semibold">
+                            <TableCell className="body-md text-foreground font-semibold">
+                                Total
+                            </TableCell>
+                            <TableCell className="tabular-dense text-foreground text-right font-semibold">
+                                {total}
+                            </TableCell>
+                        </TableRow>
+                    </TableFooter>
+                )}
             </Table>
         </div>
     );
@@ -1184,7 +1252,7 @@ StatsReportIndex.layout = {
     breadcrumbs: [
         {
             title: 'Stats Report',
-            href: '/stats-report',
+            href: statsReport.index.url(),
         },
     ],
 };

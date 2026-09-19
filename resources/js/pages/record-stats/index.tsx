@@ -1,6 +1,6 @@
-import { Head, useForm } from '@inertiajs/react';
+import { Head, Link, useForm } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
-import { Pencil, Users } from 'lucide-react';
+import { FileText, Pencil, Stethoscope, Users } from 'lucide-react';
 import InputError from '@/components/input-error';
 import { usePermissions } from '@/hooks/use-permissions';
 import { Button } from '@/components/ui/button';
@@ -28,6 +28,7 @@ import {
     storeMetricValue,
 } from '@/actions/App/Http/Controllers/DashboardController';
 import recordStats from '@/routes/record-stats';
+import statsReport from '@/routes/stats-report';
 
 type MetricDefinition = { key: string; label: string };
 
@@ -112,99 +113,135 @@ export default function RecordStatsIndex({
             <Head title="Record Stats" />
 
             <div className="flex flex-col gap-2">
-                <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
                     <div>
-                        <h1 className="headline-md text-foreground">
+                        <div className="flex items-center gap-2">
+                            <span className="bg-primary/10 text-primary label-sm rounded-md px-2.5 py-1 uppercase tracking-wider font-semibold">
+                                {weekday} · {date}
+                            </span>
+                            <span className="text-muted-foreground body-sm flex items-center gap-1.5">
+                                <span className="bg-stable size-2 rounded-full" />
+                                Shift Data Entry
+                            </span>
+                        </div>
+                        <h1 className="headline-lg text-foreground mt-2 font-bold">
                             Record Stats
                         </h1>
-                        <p className="text-muted-foreground body-sm">
-                            Daily ward movement by metric
+                        <p className="text-muted-foreground body-sm mt-0.5">
+                            Daily ward movement matrix, outpatient clinic attendance, and other tracked metrics.
                         </p>
                     </div>
-                    <span className="bg-primary/10 text-primary label-sm rounded-md px-3 py-1.5 tabular-nums">
-                        {date}
+                    <div className="flex items-center gap-2">
+                        <Button asChild variant="outline" size="sm" className="gap-1.5 font-semibold">
+                            <Link href={statsReport.index.url()}>
+                                <FileText className="size-3.5" />
+                                Analytics Report
+                            </Link>
+                        </Button>
+                    </div>
+                </div>
+            </div>
+
+            {/* Ward Movement Matrix Table */}
+            <div className="border-border bg-card shadow-layer-1 mt-6 overflow-hidden rounded-xl border">
+                <div className="border-border/70 flex items-center justify-between border-b bg-muted/50 px-4 py-3">
+                    <div>
+                        <p className="label-sm font-semibold uppercase tracking-wider text-muted-foreground">
+                            Movement Matrix
+                        </p>
+                        <h2 className="headline-sm mt-0.5 font-semibold text-foreground">
+                            Ward Patient Movements
+                        </h2>
+                    </div>
+                    <span className="body-sm text-xs text-muted-foreground">
+                        {canEdit ? 'Select any value to edit ward figures' : 'View-only mode'}
                     </span>
                 </div>
-            </div>
 
-            <div className="mt-6">
-                <Table>
-                    <TableHeader>
-                        <TableRow>
-                            <TableHead className="label-sm w-48">
-                                Metric
-                            </TableHead>
-                            {activeWards.map((ward) => (
-                                <TableHead key={ward.id} className="label-sm">
-                                    {ward.name}
+                <div className="overflow-x-auto">
+                    <Table>
+                        <TableHeader>
+                            <TableRow className="bg-muted/70 hover:bg-muted/70 border-b border-border">
+                                <TableHead className="label-sm w-48 font-bold text-foreground uppercase tracking-wider pl-4">
+                                    Metric
                                 </TableHead>
-                            ))}
-                            <TableHead className="label-sm text-right">
-                                Total
-                            </TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {metrics.map((metric) => (
-                            <TableRow key={metric.key}>
-                                <TableCell className="body-md font-medium">
-                                    {metric.label}
-                                </TableCell>
-                                {activeWards.map((ward) => {
-                                    const value =
-                                        records[ward.id]?.[metric.key] ?? 0;
-
-                                    return (
-                                        <TableCell
-                                            key={ward.id}
-                                            className="text-right"
-                                        >
-                                            {canEdit ? (
-                                                <Button
-                                                    type="button"
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    className="tabular-dense h-auto px-2 py-1"
-                                                    onClick={() =>
-                                                        setOpenWardId(ward.id)
-                                                    }
-                                                >
-                                                    {value}
-                                                </Button>
-                                            ) : (
-                                                <span className="tabular-dense text-foreground">
-                                                    {value}
-                                                </span>
-                                            )}
-                                        </TableCell>
-                                    );
-                                })}
-                                <TableCell className="tabular-dense text-right font-semibold">
-                                    {sumAcrossWards(metric.key)}
-                                </TableCell>
+                                {activeWards.map((ward) => (
+                                    <TableHead key={ward.id} className="label-sm font-bold text-foreground text-right uppercase tracking-wider px-3">
+                                        {ward.name}
+                                    </TableHead>
+                                ))}
+                                <TableHead className="label-sm text-right font-bold text-foreground uppercase tracking-wider bg-muted/90 pr-4">
+                                    Total
+                                </TableHead>
                             </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
+                        </TableHeader>
+                        <TableBody>
+                            {metrics.map((metric) => (
+                                <TableRow key={metric.key} className="hover:bg-muted/30 transition-colors border-b border-border/70">
+                                    <TableCell className="body-md font-semibold text-foreground pl-4 py-2.5">
+                                        {metric.label}
+                                    </TableCell>
+                                    {activeWards.map((ward) => {
+                                        const value =
+                                            records[ward.id]?.[metric.key] ?? 0;
+
+                                        return (
+                                            <TableCell
+                                                key={ward.id}
+                                                className="text-right px-3 py-1.5"
+                                            >
+                                                {canEdit ? (
+                                                    <Button
+                                                        type="button"
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        className="tabular-dense h-7 px-2.5 py-0.5 hover:bg-primary/10 hover:text-primary font-medium transition-colors border border-transparent hover:border-primary/20 rounded font-semibold text-foreground"
+                                                        onClick={() =>
+                                                            setOpenWardId(ward.id)
+                                                        }
+                                                    >
+                                                        {value}
+                                                    </Button>
+                                                ) : (
+                                                    <span className="tabular-dense text-foreground font-medium px-2.5 py-0.5">
+                                                        {value}
+                                                    </span>
+                                                )}
+                                            </TableCell>
+                                        );
+                                    })}
+                                    <TableCell className="tabular-dense text-right font-bold text-foreground bg-muted/40 pr-4 py-2.5">
+                                        {sumAcrossWards(metric.key)}
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </div>
             </div>
 
-            <section className="mt-6">
+            {/* Daily Summary & Outpatient Modules */}
+            <section className="mt-8">
                 <div className="mb-4">
-                    <h2 className="headline-sm text-foreground">
-                        Daily summary
-                    </h2>
-                    <p className="text-muted-foreground body-sm">
-                        Outpatient attendance and other metrics for the day
+                    <p className="label-sm text-muted-foreground uppercase tracking-wider font-semibold">
+                        Daily Rollup
                     </p>
+                    <h2 className="headline-sm text-foreground mt-0.5 font-bold">
+                        Daily Summary &amp; Outpatient Attendance
+                    </h2>
                 </div>
 
-                <div className="grid grid-cols-3 gap-4">
-                    <div className="border-border bg-card shadow-layer-1 rounded-lg border p-4">
-                        <p className="label-md text-muted-foreground">Day</p>
-                        <div className="text-foreground tabular-kpi mt-2">
-                            {weekday}
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                    <div className="border-border bg-card shadow-layer-1 rounded-lg border p-5 flex flex-col justify-between">
+                        <div>
+                            <p className="label-sm text-muted-foreground uppercase tracking-wider font-semibold">
+                                Shift Day
+                            </p>
+                            <div className="text-foreground tabular-kpi text-3xl font-bold mt-2">
+                                {weekday}
+                            </div>
                         </div>
-                        <p className="text-muted-foreground body-sm mt-1 tabular-nums">
+                        <p className="text-muted-foreground body-sm text-xs mt-2 pt-2 border-t border-border/70 tabular-nums font-medium">
                             {date}
                         </p>
                     </div>
@@ -214,47 +251,54 @@ export default function RecordStatsIndex({
                         variant="outline"
                         disabled={!canEdit}
                         onClick={() => setAttendanceOpen(true)}
-                        className="disabled:bg-muted h-auto w-full p-4 text-left transition-colors disabled:cursor-not-allowed disabled:border-transparent disabled:shadow-none"
+                        className="border-border bg-card shadow-layer-1 hover:border-primary/40 hover:bg-muted/30 rounded-lg border p-5 h-auto w-full text-left transition-all disabled:cursor-not-allowed flex flex-col justify-between items-stretch"
                     >
-                        <div className="flex items-center justify-between">
-                            <p className="label-md text-muted-foreground">
-                                Outpatients
-                            </p>
-                            {canEdit && (
-                                <Pencil className="text-muted-foreground size-4" />
-                            )}
+                        <div>
+                            <div className="flex items-center justify-between">
+                                <p className="label-sm text-muted-foreground uppercase tracking-wider font-semibold">
+                                    Outpatient Attendance
+                                </p>
+                                {canEdit && (
+                                    <span className="size-6 rounded-md bg-primary/10 text-primary flex items-center justify-center">
+                                        <Pencil className="size-3.5" />
+                                    </span>
+                                )}
+                            </div>
+                            <div className="text-foreground tabular-kpi text-3xl font-bold mt-2">
+                                {outpatients}
+                            </div>
                         </div>
-                        <div className="text-foreground tabular-kpi mt-2">
-                            {outpatients}
-                        </div>
-                        <p className="text-muted-foreground body-sm mt-1">
-                            Across {clinics.length} clinic
-                            {clinics.length === 1 ? '' : 's'}
+                        <p className="text-muted-foreground body-sm text-xs mt-2 pt-2 border-t border-border/70 font-medium">
+                            Across {clinics.length} operating clinic
+                            {clinics.length === 1 ? '' : 's'} today
                         </p>
                     </Button>
 
-                    <div className="border-border bg-card shadow-layer-1 rounded-lg border p-4">
-                        <p className="label-md text-muted-foreground">
-                            Total patients
-                        </p>
-                        <div className="text-primary tabular-kpi mt-2">
-                            {totalPatients}
+                    <div className="border-border bg-card shadow-layer-1 rounded-lg border p-5 flex flex-col justify-between">
+                        <div>
+                            <p className="label-sm text-muted-foreground uppercase tracking-wider font-semibold">
+                                Total Clinic Volume
+                            </p>
+                            <div className="text-primary tabular-kpi text-3xl font-bold mt-2">
+                                {totalPatients}
+                            </div>
                         </div>
-                        <p className="text-muted-foreground body-sm mt-1">
-                            Sum of clinic attendance
+                        <p className="text-muted-foreground body-sm text-xs mt-2 pt-2 border-t border-border/70 font-medium">
+                            Sum of all clinic patient attendances
                         </p>
                     </div>
                 </div>
 
-                <div className="mt-4 grid gap-4 lg:grid-cols-[3fr_1fr]">
+                <div className="mt-4 grid gap-4 lg:grid-cols-[3fr_1.5fr]">
+                    {/* Operating Clinics Grid */}
                     <div className="border-border bg-card shadow-layer-1 rounded-lg border">
-                        <div className="border-border/70 flex items-center justify-between border-b px-4 py-3">
+                        <div className="border-border/70 flex items-center justify-between border-b px-4 py-3.5">
                             <div>
-                                <p className="label-sm text-muted-foreground">
-                                    Clinics
+                                <p className="label-sm text-muted-foreground uppercase tracking-wider font-semibold">
+                                    Outpatient Clinics
                                 </p>
-                                <h3 className="headline-sm text-foreground mt-1">
-                                    Operating {weekday.toLowerCase()}
+                                <h3 className="headline-sm text-foreground mt-0.5 font-bold">
+                                    Operating {weekday}
                                 </h3>
                             </div>
                             <Users className="text-muted-foreground size-5" />
@@ -265,20 +309,20 @@ export default function RecordStatsIndex({
                                 No clinics operate on {weekday}.
                             </div>
                         ) : (
-                            <div className="grid gap-4 p-4 sm:grid-cols-2 xl:grid-cols-3">
+                            <div className="grid gap-3 p-4 sm:grid-cols-2 xl:grid-cols-3">
                                 {clinics.map((clinic) => (
                                     <div
                                         key={clinic.id}
-                                        className="border-border shadow-layer-1 rounded-lg border p-4"
+                                        className="border-border/80 bg-background/60 hover:bg-muted/20 shadow-xs rounded-lg border p-4 flex flex-col justify-between transition-colors"
                                     >
-                                        <p className="label-md text-muted-foreground">
+                                        <p className="body-sm font-semibold text-foreground line-clamp-1">
                                             {clinic.name}
                                         </p>
                                         <div className="text-foreground mt-3 flex items-baseline gap-1.5">
-                                            <span className="tabular-kpi">
+                                            <span className="tabular-kpi text-2xl font-bold text-foreground">
                                                 {clinic.outpatients}
                                             </span>
-                                            <span className="text-muted-foreground body-sm">
+                                            <span className="text-muted-foreground text-xs font-medium">
                                                 patients
                                             </span>
                                         </div>
@@ -288,58 +332,65 @@ export default function RecordStatsIndex({
                         )}
                     </div>
 
-                    <div className="border-border bg-card shadow-layer-1 rounded-lg border">
-                        <div className="border-border/70 flex items-center justify-between border-b px-4 py-3">
-                            <div>
-                                <p className="label-sm text-muted-foreground">
-                                    Other metrics
-                                </p>
-                                <h3 className="headline-sm text-foreground mt-1">
-                                    Today&rsquo;s values
-                                </h3>
-                            </div>
-                            {canEdit && (
-                                <Button
-                                    type="button"
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => setMetricsOpen(true)}
-                                    className="text-primary"
-                                >
-                                    Edit
-                                </Button>
-                            )}
-                        </div>
-
-                        <div className="p-4">
-                            {otherMetrics.length === 0 ? (
-                                <div className="text-muted-foreground body-sm py-8 text-center">
-                                    No other metrics configured.
+                    {/* Other Metrics Panel */}
+                    <div className="border-border bg-card shadow-layer-1 rounded-lg border flex flex-col justify-between">
+                        <div>
+                            <div className="border-border/70 flex items-center justify-between border-b px-4 py-3.5">
+                                <div>
+                                    <p className="label-sm text-muted-foreground uppercase tracking-wider font-semibold">
+                                        Custom Metrics
+                                    </p>
+                                    <h3 className="headline-sm text-foreground mt-0.5 font-bold">
+                                        Daily Hospital Metrics
+                                    </h3>
                                 </div>
-                            ) : (
-                                <div className="border-border rounded-lg border">
-                                    <div className="divide-border/70 divide-y">
+                                <Stethoscope className="text-muted-foreground size-5" />
+                            </div>
+
+                            <div className="p-4">
+                                {otherMetrics.length === 0 ? (
+                                    <div className="text-muted-foreground body-sm py-8 text-center">
+                                        No other metrics configured.
+                                    </div>
+                                ) : (
+                                    <div className="border-border rounded-lg border divide-border/70 divide-y overflow-hidden">
                                         {otherMetrics.map((metric) => (
                                             <div
                                                 key={metric.id}
-                                                className="flex items-center justify-between px-4 py-3"
+                                                className="flex items-center justify-between px-4 py-2.5 hover:bg-muted/20 transition-colors"
                                             >
-                                                <span className="body-md font-medium">
+                                                <span className="body-sm font-medium text-foreground">
                                                     {metric.name}
                                                 </span>
-                                                <span className="tabular-dense text-foreground font-semibold">
+                                                <span className="tabular-dense text-foreground font-bold text-sm bg-muted/60 px-2.5 py-0.5 rounded">
                                                     {metric.value}
                                                 </span>
                                             </div>
                                         ))}
                                     </div>
-                                </div>
-                            )}
+                                )}
+                            </div>
                         </div>
+
+                        {canEdit && (
+                            <div className="p-4 pt-0">
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => setMetricsOpen(true)}
+                                    className="w-full gap-1.5 font-semibold text-primary hover:text-primary"
+                                >
+                                    <Pencil className="size-3.5" />
+                                    Edit Metric Values
+                                </Button>
+                            </div>
+                        )}
                     </div>
                 </div>
             </section>
 
+            {/* Modals with Clinical Card Styling & Teal Header Accents */}
             <WardStatsModal
                 ward={activeWardForModal}
                 metrics={metrics}
@@ -426,23 +477,25 @@ function WardStatsModal({
 
     return (
         <Dialog open={open} onOpenChange={(value) => !value && onClose()}>
-            <DialogContent className="max-w-lg">
-                <DialogHeader>
-                    <DialogTitle className="headline-md">
-                        {ward.name}
-                    </DialogTitle>
-                    <DialogDescription className="body-sm">
-                        Record today&rsquo;s movement figures for this ward.
-                    </DialogDescription>
-                </DialogHeader>
+            <DialogContent className="max-w-lg p-0 overflow-hidden border-border bg-card shadow-layer-3">
+                <div className="border-b border-border border-t-4 border-t-primary bg-muted/60 px-6 py-5">
+                    <DialogHeader>
+                        <DialogTitle className="headline-md font-bold text-foreground">
+                            {ward.name}
+                        </DialogTitle>
+                        <DialogDescription className="body-sm text-muted-foreground mt-1">
+                            Record today&rsquo;s shift movement figures for this ward.
+                        </DialogDescription>
+                    </DialogHeader>
+                </div>
 
-                <form onSubmit={submit} className="space-y-4">
-                    <div className="grid gap-4 sm:grid-cols-2">
+                <form onSubmit={submit} className="p-6 space-y-5">
+                    <div className="grid gap-4 sm:grid-cols-2 max-h-96 overflow-y-auto pr-1">
                         {metrics.map((metric) => (
-                            <div key={metric.key} className="grid gap-2">
+                            <div key={metric.key} className="grid gap-1.5">
                                 <Label
                                     htmlFor={`metric-${metric.key}`}
-                                    className="label-sm"
+                                    className="label-sm font-semibold text-muted-foreground uppercase tracking-wider"
                                 >
                                     {metric.label}
                                 </Label>
@@ -456,20 +509,21 @@ function WardStatsModal({
                                         setData(metric.key, e.target.value)
                                     }
                                     aria-invalid={Boolean(errors[metric.key])}
+                                    className="font-medium h-9"
                                 />
                                 <InputError message={errors[metric.key]} />
                             </div>
                         ))}
                     </div>
 
-                    <DialogFooter>
+                    <DialogFooter className="pt-2 border-t border-border">
                         <DialogClose asChild>
-                            <Button type="button" variant="secondary">
+                            <Button type="button" variant="outline">
                                 Cancel
                             </Button>
                         </DialogClose>
-                        <Button type="submit" disabled={processing}>
-                            Save
+                        <Button type="submit" disabled={processing} className="font-semibold shadow-xs">
+                            Save Movements
                         </Button>
                     </DialogFooter>
                 </form>
@@ -539,36 +593,36 @@ function AttendanceModal({
 
     return (
         <Dialog open={open} onOpenChange={(value) => !value && onClose()}>
-            <DialogContent className="max-w-lg">
-                <DialogHeader>
-                    <DialogTitle className="headline-md">
-                        Outpatient attendance
-                    </DialogTitle>
-                    <DialogDescription className="body-sm">
-                        Record today&rsquo;s attendance for each clinic
-                        operating on {date}.
-                    </DialogDescription>
-                </DialogHeader>
+            <DialogContent className="max-w-lg p-0 overflow-hidden border-border bg-card shadow-layer-3">
+                <div className="border-b border-border border-t-4 border-t-primary bg-muted/60 px-6 py-5">
+                    <DialogHeader>
+                        <DialogTitle className="headline-md font-bold text-foreground">
+                            Outpatient Attendance
+                        </DialogTitle>
+                        <DialogDescription className="body-sm text-muted-foreground mt-1">
+                            Record outpatient attendance for clinics operating on {date}.
+                        </DialogDescription>
+                    </DialogHeader>
+                </div>
 
-                <form onSubmit={submit} className="space-y-4">
+                <form onSubmit={submit} className="p-6 space-y-5">
                     {clinics.length === 0 ? (
-                        <p className="text-muted-foreground body-sm">
-                            No clinics operate today, so there is nothing to
-                            record.
+                        <p className="text-muted-foreground body-sm py-4 text-center">
+                            No clinics operate today, so there is nothing to record.
                         </p>
                     ) : (
-                        <div className="grid gap-4">
+                        <div className="grid gap-4 max-h-96 overflow-y-auto pr-1">
                             {data.clinics.map((clinic, index) => (
-                                <div key={index} className="grid gap-2">
+                                <div key={index} className="grid gap-1.5">
                                     <div className="flex items-center justify-between">
                                         <Label
                                             htmlFor={`attendance-${index}`}
-                                            className="label-sm"
+                                            className="label-sm font-semibold text-muted-foreground uppercase tracking-wider"
                                         >
                                             {clinics[index]?.name ??
                                                 `Clinic ${index + 1}`}
                                         </Label>
-                                        <span className="text-muted-foreground body-sm tabular-nums">
+                                        <span className="text-muted-foreground body-sm text-xs tabular-nums font-semibold">
                                             {clinic.outpatients} patients
                                         </span>
                                     </div>
@@ -584,6 +638,7 @@ function AttendanceModal({
                                                 e.target.value,
                                             )
                                         }
+                                        className="font-medium h-9"
                                     />
                                     <InputError />
                                 </div>
@@ -591,9 +646,9 @@ function AttendanceModal({
                         </div>
                     )}
 
-                    <DialogFooter>
+                    <DialogFooter className="pt-2 border-t border-border">
                         <DialogClose asChild>
-                            <Button type="button" variant="secondary">
+                            <Button type="button" variant="outline">
                                 Cancel
                             </Button>
                         </DialogClose>
@@ -602,8 +657,9 @@ function AttendanceModal({
                             disabled={
                                 !canEdit || processing || clinics.length === 0
                             }
+                            className="font-semibold shadow-xs"
                         >
-                            Save
+                            Save Attendance
                         </Button>
                     </DialogFooter>
                 </form>
@@ -666,28 +722,30 @@ function MetricValueModal({
 
     return (
         <Dialog open={open} onOpenChange={(value) => !value && onClose()}>
-            <DialogContent className="max-w-lg">
-                <DialogHeader>
-                    <DialogTitle className="headline-md">
-                        Other metric values
-                    </DialogTitle>
-                    <DialogDescription className="body-sm">
-                        Record today&rsquo;s value for each metric on {date}.
-                    </DialogDescription>
-                </DialogHeader>
+            <DialogContent className="max-w-lg p-0 overflow-hidden border-border bg-card shadow-layer-3">
+                <div className="border-b border-border border-t-4 border-t-primary bg-muted/60 px-6 py-5">
+                    <DialogHeader>
+                        <DialogTitle className="headline-md font-bold text-foreground">
+                            Other Metric Values
+                        </DialogTitle>
+                        <DialogDescription className="body-sm text-muted-foreground mt-1">
+                            Record today&rsquo;s hospital-wide metric values on {date}.
+                        </DialogDescription>
+                    </DialogHeader>
+                </div>
 
-                <form onSubmit={submit} className="space-y-4">
+                <form onSubmit={submit} className="p-6 space-y-5">
                     {otherMetrics.length === 0 ? (
-                        <p className="text-muted-foreground body-sm">
+                        <p className="text-muted-foreground body-sm py-4 text-center">
                             No other metrics are configured yet.
                         </p>
                     ) : (
-                        <div className="grid gap-4">
+                        <div className="grid gap-4 max-h-96 overflow-y-auto pr-1">
                             {data.metrics.map((metric, index) => (
-                                <div key={index} className="grid gap-2">
+                                <div key={index} className="grid gap-1.5">
                                     <Label
                                         htmlFor={`metric-value-${index}`}
-                                        className="label-sm"
+                                        className="label-sm font-semibold text-muted-foreground uppercase tracking-wider"
                                     >
                                         {otherMetrics[index]?.name ??
                                             `Metric ${index + 1}`}
@@ -704,6 +762,7 @@ function MetricValueModal({
                                                 e.target.value,
                                             )
                                         }
+                                        className="font-medium h-9"
                                     />
                                     <InputError />
                                 </div>
@@ -711,9 +770,9 @@ function MetricValueModal({
                         </div>
                     )}
 
-                    <DialogFooter>
+                    <DialogFooter className="pt-2 border-t border-border">
                         <DialogClose asChild>
-                            <Button type="button" variant="secondary">
+                            <Button type="button" variant="outline">
                                 Cancel
                             </Button>
                         </DialogClose>
@@ -724,8 +783,9 @@ function MetricValueModal({
                                 processing ||
                                 otherMetrics.length === 0
                             }
+                            className="font-semibold shadow-xs"
                         >
-                            Save
+                            Save Metric Values
                         </Button>
                     </DialogFooter>
                 </form>

@@ -102,7 +102,7 @@ export default function OtherMetricsIndex({
                 />
             </div>
 
-            <div className="border-border bg-muted/50 mb-6 flex flex-wrap items-center gap-3 rounded-lg border p-3">
+            <div className="border-border bg-card mb-6 flex flex-wrap items-center gap-3 rounded-xl border p-3 shadow-layer-1">
                 <form
                     onSubmit={submitFilters}
                     className="flex w-full flex-wrap items-center gap-3 sm:max-w-xl"
@@ -138,7 +138,7 @@ export default function OtherMetricsIndex({
                     </Select>
                     <Button
                         type="submit"
-                        variant="secondary"
+                        variant="default"
                         size="sm"
                         disabled={processing}
                     >
@@ -156,14 +156,15 @@ export default function OtherMetricsIndex({
             </div>
 
             <div className="space-y-4">
-                <Table>
-                    <TableHeader>
-                        <TableRow>
-                            <TableHead className="w-[40%]">Metric</TableHead>
-                            <TableHead>Status</TableHead>
-                            <TableHead>Actions</TableHead>
-                        </TableRow>
-                    </TableHeader>
+                <div className="border-border bg-card shadow-layer-1 overflow-hidden rounded-xl border">
+                    <Table>
+                        <TableHeader className="bg-muted/50 border-b border-border">
+                            <TableRow>
+                                <TableHead className="w-[40%] font-bold uppercase text-xs tracking-wider text-muted-foreground">Metric</TableHead>
+                                <TableHead className="font-bold uppercase text-xs tracking-wider text-muted-foreground">Status</TableHead>
+                                <TableHead className="font-bold uppercase text-xs tracking-wider text-muted-foreground">Actions</TableHead>
+                            </TableRow>
+                        </TableHeader>
                     <TableBody>
                         {otherMetrics.map((otherMetric) => (
                             <TableRow key={otherMetric.id}>
@@ -240,6 +241,7 @@ export default function OtherMetricsIndex({
                         )}
                     </TableBody>
                 </Table>
+                </div>
 
                 <Pagination
                     meta={pagination}

@@ -127,7 +127,7 @@ export default function UsersIndex({
                     </Select>
                     <Button
                         type="submit"
-                        variant="secondary"
+                        variant="default"
                         size="sm"
                         disabled={processing}
                     >
@@ -145,15 +145,16 @@ export default function UsersIndex({
             </div>
 
             <div className="space-y-4">
-                <Table>
-                    <TableHeader>
-                        <TableRow>
-                            <TableHead className="w-[35%]">User</TableHead>
-                            <TableHead>Email</TableHead>
-                            <TableHead>Roles</TableHead>
-                            <TableHead>Actions</TableHead>
-                        </TableRow>
-                    </TableHeader>
+                <div className="border-border bg-card shadow-layer-1 rounded-lg border overflow-hidden">
+                    <Table>
+                        <TableHeader className="bg-muted/50 border-b border-border">
+                            <TableRow>
+                                <TableHead className="w-[35%] font-bold uppercase text-xs tracking-wider text-muted-foreground">User</TableHead>
+                                <TableHead className="font-bold uppercase text-xs tracking-wider text-muted-foreground">Email</TableHead>
+                                <TableHead className="font-bold uppercase text-xs tracking-wider text-muted-foreground">Roles</TableHead>
+                                <TableHead className="font-bold uppercase text-xs tracking-wider text-muted-foreground">Actions</TableHead>
+                            </TableRow>
+                        </TableHeader>
                     <TableBody>
                         {users.map((user) => (
                             <TableRow key={user.id}>
@@ -228,6 +229,7 @@ export default function UsersIndex({
                         )}
                     </TableBody>
                 </Table>
+                </div>
 
                 <Pagination
                     meta={pagination}

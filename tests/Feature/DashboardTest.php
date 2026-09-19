@@ -3,7 +3,9 @@
 use App\Models\Clinic;
 use App\Models\ClinicAttendance;
 use App\Models\OtherMetric;
+use App\Models\RecordStat;
 use App\Models\User;
+use App\Models\Ward;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Date;
 use Inertia\Testing\AssertableInertia as Assert;
@@ -150,4 +152,129 @@ test('admin can store other metric values', function () {
         'other_metric_id' => $metric->id,
         'value' => 5,
     ]);
+});
+
+test('dashboard renders with live record stats, flow, and census metrics', function () {
+    $wardA = Ward::factory()->create([
+        'name' => 'Trauma Ward',
+        'status' => 'Active',
+        'beds_count' => 20,
+    ]);
+
+    $wardB = Ward::factory()->create([
+        'name' => 'Maternity Ward',
+        'status' => 'Active',
+        'beds_count' => 30,
+    ]);
+
+    RecordStat::factory()->create([
+        'ward_id' => $wardA->id,
+        'stat_date' => Date::today(),
+        'inpatients' => 15,
+        'admission' => 6,
+        'discharges' => 2,
+        'emergencies' => 4,
+        'trans_in' => 1,
+        'trans_out' => 0,
+        'death' => 0,
+        'sama' => 0,
+        'abscond' => 0,
+    ]);
+
+    RecordStat::factory()->create([
+        'ward_id' => $wardB->id,
+        'stat_date' => Date::today(),
+        'inpatients' => 10,
+        'admission' => 3,
+        'discharges' => 4,
+        'emergencies' => 1,
+        'trans_in' => 0,
+        'trans_out' => 1,
+        'death' => 0,
+        'sama' => 0,
+        'abscond' => 0,
+    ]);
+
+    $clinic = Clinic::factory()->create([
+        'name' => 'Eye Clinic',
+        'operating_days' => [Date::today()->format('l')],
+    ]);
+
+    ClinicAttendance::factory()->create([
+        'clinic_id' => $clinic->id,
+        'stat_date' => Date::today(),
+        'outpatients' => 18,
+    ]);
+
+    $response = $this->actingAs($this->admin)->get(route('dashboard'));
+
+    $response->assertOk();
+    $response->assertInertia(fn (Assert $page) => $page
+        ->component('dashboard')
+        ->where('census.total_beds', 50)
+        ->where('census.total_inpatients', 25)
+        ->where('census.available_beds', 25)
+        ->where('census.occupancy_rate', 50)
+        ->where('census.surge_status', 'optimal')
+        ->where('flow.admissions', 9)
+        ->where('flow.discharges', 6)
+        ->where('flow.emergencies', 5)
+        ->where('flow.net_flow', 3)
+        ->where('clinics.total_outpatients', 18)
+        ->has('trend', 7)
+        ->has('ward_breakdown', 2)
+    );
+});
+
+test('dashboard attention queue flags surge wards, mortalities, and irregular exits', function () {
+    $ward = Ward::factory()->create([
+        'name' => 'Intensive Care Unit',
+        'status' => 'Active',
+        'beds_count' => 10,
+    ]);
+
+    RecordStat::factory()->create([
+        'ward_id' => $ward->id,
+        'stat_date' => Date::today(),
+        'inpatients' => 10, // 100% capacity
+        'admission' => 2,
+        'discharges' => 0,
+        'death' => 1,
+        'sama' => 1,
+        'abscond' => 0,
+        'trans_in' => 2,
+        'trans_out' => 1,
+    ]);
+
+    $response = $this->actingAs($this->admin)->get(route('dashboard'));
+
+    $response->assertInertia(fn (Assert $page) => $page
+        ->component('dashboard')
+        ->where('census.occupancy_rate', 100)
+        ->where('census.surge_status', 'surge')
+        ->has('attention_queue', 4) // surge, mortality, irregular exit (SAMA), transfers
+    );
+});
+
+test('inactive wards are excluded from dashboard bed census and breakdown', function () {
+    Ward::factory()->create([
+        'name' => 'Active Ward',
+        'status' => 'Active',
+        'beds_count' => 20,
+    ]);
+
+    Ward::factory()->create([
+        'name' => 'Closed Ward',
+        'status' => 'Inactive',
+        'beds_count' => 15,
+    ]);
+
+    $response = $this->actingAs($this->admin)->get(route('dashboard'));
+
+    $response->assertInertia(fn (Assert $page) => $page
+        ->component('dashboard')
+        ->where('census.total_beds', 20)
+        ->has('ward_breakdown', 1)
+        ->where('ward_breakdown.0.name', 'Active Ward')
+    );
 });

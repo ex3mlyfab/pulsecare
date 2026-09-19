@@ -58,10 +58,10 @@ export default function UserCreate({
                 description="Create a user account and assign roles"
             />
 
-            <div className="border-border bg-card shadow-layer-1 max-w-2xl rounded-lg border overflow-hidden">
-                <div className="border-b border-border border-t-4 border-t-primary bg-muted/60 px-6 py-5">
+            <div className="border-border bg-card shadow-layer-1 max-w-2xl overflow-hidden rounded-xl border">
+                <div className="border-b border-border border-t-4 border-t-primary bg-muted/50 px-6 py-5">
                     <h2 className="headline-sm font-bold text-foreground">User Details</h2>
-                    <p className="body-sm text-muted-foreground mt-0.5">Set credentials and assign roles for this user account.</p>
+                    <p className="body-sm mt-0.5 text-muted-foreground">Set credentials and assign roles for this user account.</p>
                 </div>
                 <form onSubmit={submit} className="p-6 space-y-6">
                 <div className="grid gap-2">

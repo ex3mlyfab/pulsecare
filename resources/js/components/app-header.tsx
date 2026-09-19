@@ -118,13 +118,18 @@ const adminNavItems: NavItem[] = [
 ];
 
 const activeItemStyles =
-    'bg-primary/10 text-primary font-semibold dark:bg-primary/20 dark:text-primary';
+    'bg-primary/10 text-primary font-semibold ring-1 ring-primary/20 shadow-[inset_0_0_0_1px_rgba(59,130,246,0.08)] dark:bg-primary/20 dark:text-primary';
 
 export function AppHeader({ breadcrumbs = [] }: Props) {
     const page = usePage();
     const { auth } = page.props;
     const getInitials = useInitials();
-    const { isCurrentUrl, whenCurrentUrl } = useCurrentUrl();
+    const { isCurrentUrl, isCurrentOrParentUrl, whenCurrentUrl } =
+        useCurrentUrl();
+
+    const hasActiveAdminItem = adminNavItems.some((item) =>
+        isCurrentOrParentUrl(item.href),
+    );
 
     return (
         <>
@@ -160,11 +165,10 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                                     key={item.title}
                                                     href={item.href}
                                                     className={cn(
-                                                        'hover:bg-accent hover:text-accent-foreground flex items-center space-x-2 rounded-sm px-2 py-1.5 text-sm font-medium transition-colors',
+                                                        'hover:bg-primary/5 hover:text-primary flex items-center space-x-2 rounded-sm px-2 py-1.5 text-sm font-medium transition-colors',
                                                         isCurrentUrl(
                                                             item.href,
-                                                        ) &&
-                                                            'bg-primary/10 text-primary font-semibold',
+                                                        ) && activeItemStyles,
                                                     )}
                                                 >
                                                     {item.icon && (
@@ -176,10 +180,17 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                         </div>
 
                                         <Collapsible
-                                            defaultOpen={false}
+                                            defaultOpen={hasActiveAdminItem}
                                             className="flex flex-col"
                                         >
-                                            <CollapsibleTrigger className="group focus-visible:ring-ring hover:bg-accent hover:text-accent-foreground flex items-center space-x-2 rounded-sm px-2 py-1.5 text-left text-sm font-medium transition-colors outline-none focus-visible:ring-2 focus-visible:ring-offset-2">
+                                            <CollapsibleTrigger
+                                                data-active={hasActiveAdminItem}
+                                                className={cn(
+                                                    'group focus-visible:ring-ring hover:bg-primary/5 hover:text-primary flex items-center space-x-2 rounded-sm px-2 py-1.5 text-left text-sm font-medium transition-colors outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
+                                                    hasActiveAdminItem &&
+                                                        activeItemStyles,
+                                                )}
+                                            >
                                                 <Shield className="h-5 w-5" />
                                                 <span>App Admin</span>
                                                 <ChevronDown className="ml-auto h-4 w-4 transition-transform duration-200 group-data-[state=open]:rotate-180" />
@@ -190,11 +201,11 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                                         key={item.title}
                                                         href={item.href}
                                                         className={cn(
-                                                            'hover:bg-accent hover:text-accent-foreground focus-visible:ring-ring rounded-sm px-2 py-1.5 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:outline-none',
+                                                            'hover:bg-primary/5 hover:text-primary focus-visible:ring-ring rounded-sm px-2 py-1.5 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:outline-none',
                                                             isCurrentUrl(
                                                                 item.href,
                                                             ) &&
-                                                                'bg-primary/10 text-primary font-semibold',
+                                                                activeItemStyles,
                                                         )}
                                                     >
                                                         {item.title}
@@ -235,7 +246,7 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
 
                     {/* Desktop Navigation */}
                     <div className="ml-6 hidden h-full items-center space-x-6 lg:flex">
-                        <NavigationMenu className="flex h-full items-stretch">
+                        <NavigationMenu viewport={false}>
                             <NavigationMenuList className="flex h-full items-stretch space-x-2">
                                 {mainNavItems.map((item, index) => (
                                     <NavigationMenuItem
@@ -246,11 +257,11 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                             href={item.href}
                                             className={cn(
                                                 navigationMenuTriggerStyle(),
+                                                'hover:bg-primary/5 hover:text-primary focus-visible:ring-ring h-9 cursor-pointer px-3 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none',
                                                 whenCurrentUrl(
                                                     item.href,
                                                     activeItemStyles,
                                                 ),
-                                                'hover:bg-accent hover:text-accent-foreground focus-visible:ring-ring h-9 cursor-pointer px-3 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none',
                                             )}
                                         >
                                             {item.icon && (
@@ -269,14 +280,11 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                             </NavigationMenuList>
                             <NavigationMenuItem className="relative flex h-full items-center">
                                 <NavigationMenuTrigger
+                                    data-active={hasActiveAdminItem}
                                     className={cn(
                                         navigationMenuTriggerStyle(),
-                                        isCurrentUrl(
-                                            '/admin',
-                                            undefined,
-                                            true,
-                                        ) && activeItemStyles,
-                                        'hover:bg-accent hover:text-accent-foreground focus-visible:ring-ring h-9 cursor-pointer px-3 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none',
+                                        'hover:bg-primary/5 hover:text-primary focus-visible:ring-ring h-9 cursor-pointer px-3 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none',
+                                        hasActiveAdminItem && activeItemStyles,
                                     )}
                                 >
                                     <Shield className="mr-2 h-4 w-4" />
@@ -290,11 +298,11 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                                     <Link
                                                         href={item.href}
                                                         className={cn(
-                                                            'hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus-visible:ring-ring block rounded-sm px-3 py-2 text-sm font-medium transition-colors select-none focus-visible:ring-2 focus-visible:outline-none',
+                                                            'hover:bg-primary/5 hover:text-primary focus:bg-primary/5 focus:text-primary focus-visible:ring-ring block rounded-sm px-3 py-2 text-sm font-medium transition-colors select-none focus-visible:ring-2 focus-visible:outline-none',
                                                             isCurrentUrl(
                                                                 item.href,
                                                             ) &&
-                                                                'bg-primary/10 text-primary font-semibold',
+                                                                'bg-primary/10 text-primary ring-primary/15 font-semibold ring-1 shadow-[inset_0_0_0_1px_rgba(59,130,246,0.08)]',
                                                         )}
                                                     >
                                                         {item.title}
@@ -313,7 +321,7 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                             <Button
                                 variant="ghost"
                                 size="icon"
-                                className="group h-9 w-9 cursor-pointer"
+                                className="group h-9 w-9 cursor-pointer border border-transparent bg-muted/40 hover:bg-primary/5 hover:text-primary"
                             >
                                 <Search className="!size-5 opacity-80 group-hover:opacity-100" />
                             </Button>
@@ -325,7 +333,7 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                                 href={toUrl(item.href)}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
-                                                className="group ring-offset-background hover:bg-accent hover:text-accent-foreground focus-visible:ring-ring disabled:bg-muted disabled:text-muted-foreground/70 inline-flex h-9 w-9 items-center justify-center rounded-sm bg-transparent p-0 transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:pointer-events-none"
+                                                className="group ring-offset-background hover:bg-primary/5 hover:text-primary focus-visible:ring-ring disabled:bg-muted disabled:text-muted-foreground/70 inline-flex h-9 w-9 items-center justify-center rounded-sm bg-muted/40 p-0 transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:pointer-events-none"
                                             >
                                                 <span className="sr-only">
                                                     {item.title}
@@ -346,7 +354,7 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                             <DropdownMenuTrigger asChild>
                                 <Button
                                     variant="ghost"
-                                    className="size-10 rounded-full p-1"
+                                    className="size-10 rounded-full border border-border bg-muted/40 p-1 shadow-sm ring-1 ring-border/70 hover:bg-primary/5 hover:text-primary"
                                 >
                                     <Avatar className="size-8 overflow-hidden rounded-full">
                                         <AvatarImage

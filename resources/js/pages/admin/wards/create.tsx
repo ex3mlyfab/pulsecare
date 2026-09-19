@@ -80,10 +80,10 @@ export default function WardCreate({
                 description="Create a new hospital ward and assign a matron in charge"
             />
 
-            <div className="border-border bg-card shadow-layer-1 max-w-2xl rounded-lg border overflow-hidden">
-                <div className="border-b border-border border-t-4 border-t-primary bg-muted/60 px-6 py-5">
+            <div className="border-border bg-card shadow-layer-1 max-w-2xl overflow-hidden rounded-xl border">
+                <div className="border-b border-border border-t-4 border-t-primary bg-muted/50 px-6 py-5">
                     <h2 className="headline-sm font-bold text-foreground">Ward Details</h2>
-                    <p className="body-sm text-muted-foreground mt-0.5">Specify ward capacity, physical location, and matron oversight.</p>
+                    <p className="body-sm mt-0.5 text-muted-foreground">Specify ward capacity, physical location, and matron oversight.</p>
                 </div>
                 <form onSubmit={submit} className="p-6 space-y-6">
                 <div className="grid gap-2">

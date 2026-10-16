@@ -2,6 +2,7 @@ import { Link } from '@inertiajs/react';
 import {
     BarChart3,
     BookOpen,
+    ClipboardList,
     FileBarChart,
     FolderGit2,
     LayoutGrid,
@@ -24,9 +25,11 @@ import {
 import { dashboard } from '@/routes';
 import { index as recordStatsIndex } from '@/routes/record-stats';
 import { index as statsReportIndex } from '@/routes/stats-report';
+import { index as nursingDailyReportsIndex } from '@/routes/nursing-daily-reports';
 import { index as rolesIndex } from '@/routes/admin/roles';
 import { index as permissionsIndex } from '@/routes/admin/permissions';
 import { index as usersIndex } from '@/routes/admin/users';
+import { index as wardsIndex } from '@/routes/admin/wards';
 import { index as otherMetricsIndex } from '@/routes/admin/other-metrics';
 import type { NavItem } from '@/types';
 
@@ -35,6 +38,11 @@ const mainNavItems: NavItem[] = [
         title: 'Dashboard',
         href: dashboard().url,
         icon: LayoutGrid,
+    },
+    {
+        title: 'Nursing Daily Report',
+        href: nursingDailyReportsIndex().url,
+        icon: ClipboardList,
     },
     {
         title: 'Record Stats',
@@ -60,6 +68,10 @@ const appSettingsItems: NavItem[] = [
     {
         title: 'Users',
         href: usersIndex().url,
+    },
+    {
+        title: 'Wards',
+        href: wardsIndex().url,
     },
     {
         title: 'Other Metrics',

@@ -143,8 +143,9 @@ export default function Dashboard({
                                 Live Telemetry
                             </span>
                         </div>
-                        <h1 className="headline-lg text-foreground mt-2">
-                            Clinical Operations Dashboard
+                        <h1 className="headline-lg text-backbground mt-2"> Compound Office </h1>
+                        <h1 className="headline-lg text-foreground">
+                            Operations Dashboard
                         </h1>
                         <p className="text-muted-foreground body-sm mt-1">
                             Real-time inpatient census, ward flow, and outpatient telemetry aligned with daily record stats.

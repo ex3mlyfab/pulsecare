@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\ClinicController;
+use App\Http\Controllers\Admin\NursingDailyReportController;
 use App\Http\Controllers\Admin\OtherMetricController;
 use App\Http\Controllers\Admin\PermissionController;
 use App\Http\Controllers\Admin\RecordStatController;
@@ -20,6 +21,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('stats-report', [RecordStatController::class, 'report'])->name('stats-report.index');
     Route::post('record-stats', [RecordStatController::class, 'store'])->name('record-stats.store');
     Route::patch('record-stats/{record_stat}', [RecordStatController::class, 'update'])->name('record-stats.update');
+
+    Route::get('nursing-daily-reports', [NursingDailyReportController::class, 'index'])->name('nursing-daily-reports.index');
+    Route::get('nursing-daily-reports/create', [NursingDailyReportController::class, 'create'])->name('nursing-daily-reports.create');
+    Route::post('nursing-daily-reports', [NursingDailyReportController::class, 'store'])->name('nursing-daily-reports.store');
+    Route::get('nursing-daily-reports/{nursing_daily_report}', [NursingDailyReportController::class, 'show'])->name('nursing-daily-reports.show');
+    Route::get('nursing-daily-reports/{nursing_daily_report}/edit', [NursingDailyReportController::class, 'edit'])->name('nursing-daily-reports.edit');
+    Route::patch('nursing-daily-reports/{nursing_daily_report}', [NursingDailyReportController::class, 'update'])->name('nursing-daily-reports.update');
+    Route::delete('nursing-daily-reports/{nursing_daily_report}', [NursingDailyReportController::class, 'destroy'])->name('nursing-daily-reports.destroy');
 });
 
 Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(function () {

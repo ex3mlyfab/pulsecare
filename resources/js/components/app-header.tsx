@@ -3,6 +3,7 @@ import {
     BarChart3,
     BookOpen,
     ChevronDown,
+    ClipboardList,
     FileBarChart,
     Folder,
     LayoutGrid,
@@ -53,6 +54,7 @@ import { cn, toUrl } from '@/lib/utils';
 import { dashboard } from '@/routes';
 import { index as recordStatsIndex } from '@/routes/record-stats';
 import { index as statsReportIndex } from '@/routes/stats-report';
+import { index as nursingDailyReportsIndex } from '@/routes/nursing-daily-reports';
 import type { BreadcrumbItem, NavItem } from '@/types';
 
 type Props = {
@@ -64,6 +66,11 @@ const mainNavItems: NavItem[] = [
         title: 'Dashboard',
         href: dashboard(),
         icon: LayoutGrid,
+    },
+    {
+        title: 'Nurse Daily Report',
+        href: nursingDailyReportsIndex(),
+        icon: ClipboardList,
     },
     {
         title: 'Record Stats',

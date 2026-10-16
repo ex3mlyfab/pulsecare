@@ -68,6 +68,7 @@ class RbacSeeder extends Seeder
             'clinics' => ['view', 'create', 'update', 'delete'],
             'other_metrics' => ['view', 'create', 'update', 'delete'],
             'record_stats' => ['view', 'create', 'update', 'delete'],
+            'nursing_daily_reports' => ['view', 'create', 'update', 'delete'],
             'dashboard' => ['view', 'update'],
         ];
     }
